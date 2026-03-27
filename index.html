@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TSSC IT Help Desk</title>
+    <meta
+      name="description"
+      content="TSSC IT Help Desk for college technology support, account access, classroom help, and service updates."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="utility-bar">
+        <div class="utility-bar__inner container">
+          <p>Technology Support Services Center</p>
+        </div>
+      </div>
+
+      <div class="brand-bar container">
+        <a class="brand" href="#top" aria-label="TSSC IT Help Desk home">
+          <span class="brand__seal">TSSC</span>
+          <span class="brand__text">
+            <strong>IT Help Desk</strong>
+            <span>Queensborough IT support portal</span>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="#resources">Resources</a>
+          <a href="#services">Services</a>
+          <a href="#articles">Articles</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <a class="header-cta" href="#contact">Get Support</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero__backdrop"></div>
+        <div class="hero__grid container">
+          <div class="hero__content">
+            <p class="eyebrow">Welcome to the TSSC Help Center</p>
+            <h1>How can we help you succeed today?</h1>
+            <p class="hero__copy">
+              Find answers for Wi-Fi, account access, Brightspace, classroom technology,
+              software, and campus devices in one place.
+            </p>
+
+            <form class="search-panel" id="searchForm">
+              <label class="visually-hidden" for="searchInput">Search support topics</label>
+              <input
+                id="searchInput"
+                name="query"
+                type="search"
+                placeholder="Search support articles, services, or keywords"
+                autocomplete="off"
+              />
+              <button type="submit">Search</button>
+            </form>
+
+            <div class="popular-searches" aria-label="Popular searches">
+              <span>Popular searches:</span>
+              <button type="button" class="chip" data-query="password reset">password reset</button>
+              <button type="button" class="chip" data-query="wifi">wifi</button>
+              <button type="button" class="chip" data-query="brightspace">brightspace</button>
+              <button type="button" class="chip" data-query="loaner laptop">loaner laptop</button>
+            </div>
+          </div>
+
+          <aside class="hero__status" aria-label="Service status">
+            <div class="status-card">
+              <p class="status-card__label">Service Status</p>
+              <h2>All core campus systems are operational.</h2>
+              <ul>
+                <li><span></span>Wireless network</li>
+                <li><span></span>Email and account login</li>
+                <li><span></span>Learning platforms and labs</li>
+              </ul>
+              <a
+                href="https://forms.office.com/pages/responsepage.aspx?id=s_BgbwZfCU6XFZiduozH2G-mc29fFtVEtmROJIbxpb1UOVA1OVdVVk9ZM0hBUE0wR0hIOFZJTFFUSC4u&route=shorturl"
+                target="_blank"
+                rel="noreferrer"
+                >Submit a service ticket</a
+              >
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="resources section" id="resources">
+        <div class="section-heading container">
+          <p class="eyebrow">Support areas</p>
+          <h2>Start with the topic that matches your need</h2>
+          <p>
+            Each area links the most common requests handled by the college IT help desk.
+          </p>
+        </div>
+
+        <div class="card-grid container" id="services">
+          <article class="resource-card" data-query="account login password reset multifactor authentication">
+            <div class="resource-card__icon">01</div>
+            <h3>Accounts & Access</h3>
+            <p>Reset passwords, unlock accounts, and manage multi-factor authentication.</p>
+            <button type="button">Explore articles</button>
+          </article>
+
+          <article class="resource-card" data-query="wifi wireless internet eduroam campus network">
+            <div class="resource-card__icon">02</div>
+            <h3>Wi-Fi & Network</h3>
+            <p>Connect laptops, phones, and tablets to secure campus internet and services.</p>
+            <button type="button">Explore articles</button>
+          </article>
+
+          <article class="resource-card" data-query="brightspace blackboard online classes course tools">
+            <div class="resource-card__icon">03</div>
+            <h3>Learning Platforms</h3>
+            <p>Get support for Brightspace, online course tools, and student portal access.</p>
+            <button type="button">Explore articles</button>
+          </article>
+
+          <article class="resource-card" data-query="classroom projector podium av presentation equipment">
+            <div class="resource-card__icon">04</div>
+            <h3>Classroom Technology</h3>
+            <p>For classroom podiums, displays, projectors, and presentation issues, contact the Academic Computing Center (ACC).</p>
+            <button type="button">Explore articles</button>
+          </article>
+
+          <article class="resource-card" data-query="software installation computer lab adobe microsoft">
+            <div class="resource-card__icon">05</div>
+            <h3>Software & Labs</h3>
+            <p>Request software, find lab resources, and troubleshoot campus computer stations.</p>
+            <button type="button">Explore articles</button>
+          </article>
+
+          <article class="resource-card" data-query="loaner laptop printer device repair">
+            <div class="resource-card__icon">06</div>
+            <h3>Devices & Printing</h3>
+            <p>Borrow equipment, fix device issues, and locate print support across campus.</p>
+            <button type="button">Explore articles</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="articles section" id="articles">
+        <div class="container article-layout">
+          <div class="article-layout__intro">
+            <p class="eyebrow">Knowledge base</p>
+            <h2>Quick answers for common campus tech problems</h2>
+            <p>
+              Search results update instantly as you type. Select a support area above or use a
+              popular search to narrow the list.
+            </p>
+          </div>
+
+          <div class="article-layout__meta">
+            <p id="resultsSummary">Showing 6 help articles</p>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="article-list" id="articleList" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="faq section" id="faq">
+        <div class="section-heading container">
+          <p class="eyebrow">Frequently asked questions</p>
+          <h2>Answers students and faculty ask most often</h2>
+        </div>
+
+        <div class="faq-list container">
+          <article class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">
+              How quickly will the help desk respond to my request?
+            </button>
+            <div class="faq-answer">
+              <p>
+                Most requests receive an initial response within one business day. Classroom-impacting
+                issues and account lockouts are prioritized for faster follow-up.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">
+              Can I get support if I am off campus?
+            </button>
+            <div class="faq-answer">
+              <p>
+                Yes. The help desk supports remote troubleshooting for account access, online learning
+                systems, software setup, and many device issues.
+              </p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">
+              Do you offer support for classroom presentations and events?
+            </button>
+            <div class="faq-answer">
+              <p>
+                Classroom AV assistance, presentation support, and classroom-related technology outages
+                should be directed to the Academic Computing Center (ACC).
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="contact section" id="contact">
+        <div class="container contact-panel">
+          <div>
+            <p class="eyebrow">Need direct assistance?</p>
+            <h2>Reach the college IT team</h2>
+            <p>
+              Submit a help request for account access, software, and device support. Classroom-related
+              outages and in-room technology issues should be reported to the Academic Computing Center (ACC).
+            </p>
+          </div>
+
+          <div class="contact-actions">
+            <div class="contact-card contact-card--primary">
+              <a
+                class="contact-ticket-link"
+                href="https://forms.office.com/pages/responsepage.aspx?id=s_BgbwZfCU6XFZiduozH2G-mc29fFtVEtmROJIbxpb1UOVA1OVdVVk9ZM0hBUE0wR0hIOFZJTFFUSC4u&route=shorturl"
+                target="_blank"
+                rel="noreferrer"
+                >Submit a service ticket</a
+              >
+            </div>
+
+            <div class="contact-card">
+              <p class="contact-card__eyebrow">IT Help Desk</p>
+              <a href="mailto:helpdesk@tssc.edu">Email: helpdesk@tssc.edu</a>
+              <a href="tel:+17185550199">Phone: (718) 555-0199</a>
+              <span>Location: Library Building, Room 214</span>
+            </div>
+
+            <div class="contact-card">
+              <p class="contact-card__eyebrow">Academic Computing Center (ACC)</p>
+              <a href="tel:+17185556624">Classroom support phone: (718) 555-6624</a>
+              <span>Use ACC for classroom outages, podium issues, projectors, and in-room tech problems.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <p>TSSC IT Help Desk</p>
+        <p>Built for a college support experience with QCC-inspired branding.</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
