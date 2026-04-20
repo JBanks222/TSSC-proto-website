@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meet the Team – TSSC Service Desk</title>
+    <meta
+      name="description"
+      content="Meet the TSSC IT Service Desk team at Queensborough Community College. Learn about the staff who support campus technology."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="meet-the-team.css" />
+    <!--
+      Early-init: read the saved animation preference BEFORE first paint so
+      the page never flickers from animated → still. Runs inline, no delay.
+    -->
+    <script>
+      (function () {
+        if (localStorage.getItem('tssc-reduce-motion') === 'true') {
+          document.documentElement.classList.add('no-motion');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- =====================================================================
+         GLOBAL HEADER – identical structure to index.html
+         ===================================================================== -->
+    <header class="site-header">
+      <div class="utility-bar">
+        <div class="utility-bar__inner container">
+          <p>Technology Support Services Center</p>
+        </div>
+      </div>
+
+      <div class="brand-bar container">
+        <a class="brand" href="index.html" aria-label="TSSC IT Service Desk home">
+          <span class="brand__seal">TSSC</span>
+          <span class="brand__text">
+            <strong>IT Service Desk</strong>
+            <span>Queensborough IT support portal</span>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Primary navigation">
+          <a href="index.html#resources">Resources</a>
+          <a href="index.html#services">Services</a>
+          <a href="index.html#articles">Articles</a>
+          <a href="index.html#faq">FAQ</a>
+          <a href="meet-the-team.html" aria-current="page">Meet the Team</a>
+        </nav>
+
+        <a class="header-cta" href="index.html#contact">Get Support</a>
+      </div>
+    </header>
+
+    <!-- =====================================================================
+         PAGE CONTENT
+         ===================================================================== -->
+    <main id="main-content">
+
+      <!-- -----------------------------------------------------------------
+           PAGE HEADER with "mask" effect on heading text
+           How the mask works:
+             background-clip: text clips a CSS gradient to the text shape,
+             making the gradient visible only through the letterforms.
+             -webkit-text-fill-color: transparent makes the browser paint
+             the gradient instead of a flat foreground color.
+             This is purely decorative — the text remains real DOM text,
+             is fully selectable, and is read normally by screen readers.
+             A @media (prefers-reduced-motion) block is not needed here
+             because the effect is static (no animation).
+           ----------------------------------------------------------------- -->
+      <section class="team-hero" aria-labelledby="team-page-heading">
+        <div class="team-hero__backdrop" aria-hidden="true">
+          <!-- Large ambient orbs — CSS animated -->
+          <div class="team-hero__orb-a"></div>
+          <div class="team-hero__orb-b"></div>
+        </div>
+        <!--
+          Canvas for the attraction-particle system.
+          aria-hidden: purely decorative — screen readers skip it entirely.
+          The canvas is sized and driven by team-particles.js.
+          It only activates under prefers-reduced-motion: no-preference.
+        -->
+        <canvas
+          class="team-hero__canvas"
+          id="teamHeroCanvas"
+          aria-hidden="true"
+        ></canvas>
+        <div class="container team-hero__inner">
+          <p class="eyebrow">Our people</p>
+
+          <!--
+            The gradient mask is applied only to the <h1> text via the
+            .mask-text utility class. It has no effect on layout or
+            surrounding content and degrades gracefully in browsers that
+            do not support background-clip: text (text stays white).
+          -->
+          <h1 id="team-page-heading" class="mask-text">Meet the IT&nbsp;Team</h1>
+
+          <p class="team-hero__copy">
+            The TSSC staff are here to keep Queensborough's technology running
+            smoothly — from accounts and Wi-Fi to classroom systems and beyond.
+          </p>
+        </div>
+      </section>
+
+      <!-- -----------------------------------------------------------------
+           TEAM GRID
+           Uses a <ul> of <li> elements containing <article> cards for
+           correct list semantics and screen-reader announcement of item
+           count. Each card is keyboard-focusable via a visible focus ring.
+           ----------------------------------------------------------------- -->
+      <section class="team-section section" aria-labelledby="team-grid-heading">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">IT Staff directory</p>
+            <h2 id="team-grid-heading">The people behind your support</h2>
+            <p>
+              Each member of the TSSC team brings specialized expertise to
+              make campus technology accessible to every student and faculty member.
+            </p>
+          </div>
+
+          <!--
+            Dynamic list target. team-members.js creates each list item from
+            employees.json on page load.
+          -->
+          <ul class="team-grid" id="teamGrid" role="list"></ul>
+
+          <p class="team-grid-status" id="teamGridStatus" aria-live="polite"></p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =====================================================================
+         GLOBAL FOOTER – identical structure to index.html
+         ===================================================================== -->
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <p>TSSC Service Desk &amp; Academic Computing Center</p>
+        <p>Design by Jalen Banks</p>
+      </div>
+    </footer>
+    <!--
+      Accessibility motion toggle
+      ─────────────────────────────────────────────────────────────────────
+      role="switch" + aria-checked communicates on/off state to screen
+      readers as a toggle switch ("Reduce motion, switch, off").
+      aria-label provides a concise spoken label.
+      The button is always visible and keyboard-operable (Enter / Space).
+    -->
+    <button
+      class="motion-toggle"
+      id="motionToggle"
+      type="button"
+      role="switch"
+      aria-checked="false"
+      aria-label="Reduce motion"
+    >
+      <span class="motion-toggle__track" aria-hidden="true">
+        <span class="motion-toggle__thumb"></span>
+      </span>
+      <span class="motion-toggle__label">Reduce&nbsp;motion</span>
+    </button>
+
+    <script src="team-members.js"></script>
+    <script src="team-particles.js"></script>
+    <script>
+      /* ── Animation toggle ─────────────────────────────────────────────
+         Manages the manual "Reduce motion" switch.
+
+         State storage: localStorage key "tssc-reduce-motion" = "true"|"false"
+         DOM signal:    <html> class "no-motion" drives all CSS overrides.
+         Canvas signal: window.__tsscReduceMotion flag read by team-particles.js
+
+         The early-init script in <head> already applied the saved class
+         before first paint, so there is no FOUC.
+      ─────────────────────────────────────────────────────────────────── */
+      (function () {
+        const btn  = document.getElementById('motionToggle');
+        const root = document.documentElement;
+        const KEY  = 'tssc-reduce-motion';
+
+        /* Sync button state to current class (set by early-init or default) */
+        function syncButton () {
+          const reduced = root.classList.contains('no-motion');
+          btn.setAttribute('aria-checked', reduced ? 'true' : 'false');
+          /* Expose flag for team-particles.js */
+          window.__tsscReduceMotion = reduced;
+        }
+
+        function toggle () {
+          const willReduce = !root.classList.contains('no-motion');
+          root.classList.toggle('no-motion', willReduce);
+          localStorage.setItem(KEY, willReduce ? 'true' : 'false');
+          syncButton();
+
+          /* Tell the particle canvas to pause/resume without a page reload */
+          window.dispatchEvent(new CustomEvent('tssc-motion-change', {
+            detail: { reduced: willReduce }
+          }));
+        }
+
+        btn.addEventListener('click', toggle);
+
+        /* Support Enter and Space explicitly for role="switch" */
+        btn.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
+
+        /* Initial sync on page load */
+        syncButton();
+      })();
+    </script>
+  </body>
+</html>

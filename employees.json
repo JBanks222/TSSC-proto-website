@@ -1,0 +1,40 @@
+{
+  "employees": [
+    {
+      "name": "Marcus Reid",
+      "role": "Help Desk Manager",
+      "bio": "Marcus oversees daily service desk operations and ensures tickets are resolved efficiently for students and faculty.",
+      "headshot": "headshots/headshot1.webp",
+      "email": "mreid@qcc.cuny.edu"
+    },
+    {
+      "name": "Simone Carter",
+      "role": "Systems & Network Specialist",
+      "bio": "Simone maintains campus network infrastructure and handles Wi-Fi, VPN, and identity management across all buildings.",
+      "headshot": "headshots/headshot2.webp",
+      "email": "scarter@qcc.cuny.edu"
+    },
+    {
+      "name": "Devon Okafor",
+      "role": "Desktop Support Technician",
+      "bio": "Devon specializes in hardware troubleshooting, software installation, and loaner device management for the campus community.",
+      "headshot": "headshots/headshot3.jpg",
+      "email": "dokafor@qcc.cuny.edu"
+    },
+    {
+      "name": "Priya Nambiar",
+      "role": "Learning Platforms Support",
+      "bio": "Priya supports Brightspace, student portals, and online course tools, helping faculty and students navigate digital learning.",
+      "headshot": "headshots/headshot4.jpg",
+      "email": "pnambiar@qcc.cuny.edu"
+    }
+    ,
+    {
+      "name": "Jason Tester",
+      "role": "Professional parser",
+      "bio": "does what the name implies :)",
+      "headshot": "headshots/headshot5.webp",
+      "email": "json@qcc.cuny.edu"
+    }
+  ]
+}
