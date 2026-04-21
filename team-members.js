@@ -21,15 +21,20 @@
 
       const data = await response.json();
       const employees = Array.isArray(data.employees) ? data.employees : [];
+      const sortedEmployees = employees.slice().sort(function (a, b) {
+        const nameA = typeof a.name === 'string' ? a.name.trim() : '';
+        const nameB = typeof b.name === 'string' ? b.name.trim() : '';
+        return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+      });
 
-      if (employees.length === 0) {
+      if (sortedEmployees.length === 0) {
         status.textContent = 'No team members are listed yet.';
         return;
       }
 
       const fragment = document.createDocumentFragment();
 
-      employees.forEach(function (employee) {
+      sortedEmployees.forEach(function (employee) {
         const name = typeof employee.name === 'string' ? employee.name.trim() : '';
         const role = typeof employee.role === 'string' ? employee.role.trim() : '';
         const bio = typeof employee.bio === 'string' ? employee.bio.trim() : '';
