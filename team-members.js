@@ -22,8 +22,12 @@
       const data = await response.json();
       const employees = Array.isArray(data.employees) ? data.employees : [];
       const sortedEmployees = employees.slice().sort(function (a, b) {
-        const nameA = typeof a.name === 'string' ? a.name.trim() : '';
-        const nameB = typeof b.name === 'string' ? b.name.trim() : '';
+        const firstA = typeof a['First Name'] === 'string' ? a['First Name'].trim() : '';
+        const lastA = typeof a['Last Name'] === 'string' ? a['Last Name'].trim() : '';
+        const firstB = typeof b['First Name'] === 'string' ? b['First Name'].trim() : '';
+        const lastB = typeof b['Last Name'] === 'string' ? b['Last Name'].trim() : '';
+        const nameA = (firstA + ' ' + lastA).trim() || (typeof a.name === 'string' ? a.name.trim() : '');
+        const nameB = (firstB + ' ' + lastB).trim() || (typeof b.name === 'string' ? b.name.trim() : '');
         return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
       });
 
@@ -35,13 +39,41 @@
       const fragment = document.createDocumentFragment();
 
       sortedEmployees.forEach(function (employee) {
-        const name = typeof employee.name === 'string' ? employee.name.trim() : '';
-        const role = typeof employee.role === 'string' ? employee.role.trim() : '';
-        const bio = typeof employee.bio === 'string' ? employee.bio.trim() : '';
-        const headshot = typeof employee.headshot === 'string' ? employee.headshot.trim() : '';
-        const email = typeof employee.email === 'string' ? employee.email.trim() : '';
+        const firstName = typeof employee['First Name'] === 'string' ? employee['First Name'].trim() : '';
+        const lastName = typeof employee['Last Name'] === 'string' ? employee['Last Name'].trim() : '';
+        const name = (firstName + ' ' + lastName).trim() ||
+          (typeof employee.name === 'string' ? employee.name.trim() : '');
 
-        if (!name || !role || !bio || !headshot) {
+        const title = typeof employee['Title'] === 'string' ? employee['Title'].trim() : '';
+        const department = typeof employee['Department/Team'] === 'string'
+          ? employee['Department/Team'].trim()
+          : '';
+        const yearStarted = typeof employee['Year Started'] === 'string'
+          ? employee['Year Started'].trim()
+          : '';
+        const role = [title, department, yearStarted ? 'Since ' + yearStarted : '']
+          .filter(Boolean)
+          .join(' | ') ||
+          (typeof employee.role === 'string' ? employee.role.trim() : '');
+
+        const contributions = typeof employee['Role & Contributions'] === 'string'
+          ? employee['Role & Contributions'].trim()
+          : '';
+        const funFact = typeof employee['Fun Fact or Interests'] === 'string'
+          ? employee['Fun Fact or Interests'].trim()
+          : '';
+        const bio = contributions || (typeof employee.bio === 'string' ? employee.bio.trim() : '');
+
+        const photoRaw = typeof employee['Photo'] === 'string'
+          ? employee['Photo'].trim()
+          : (typeof employee.headshot === 'string' ? employee.headshot.trim() : '');
+        const isCameraShy = photoRaw.toLowerCase() === 'camera shy';
+        const headshot = (isCameraShy || !photoRaw) ? 'headshots/placeholder.png' : photoRaw;
+        const email = typeof employee.Email === 'string'
+          ? employee.Email.trim()
+          : (typeof employee.email === 'string' ? employee.email.trim() : '');
+
+        if (!name || !role || !bio) {
           return;
         }
 
@@ -57,7 +89,7 @@
         const img = document.createElement('img');
         img.className = 'team-card__photo';
         img.src = headshot;
-        img.alt = 'Portrait of ' + name;
+        img.alt = isCameraShy ? 'Camera shy placeholder for ' + name : 'Portrait of ' + name;
         img.width = 120;
         img.height = 120;
         img.loading = 'lazy';
@@ -82,6 +114,23 @@
         body.appendChild(nameEl);
         body.appendChild(roleEl);
         body.appendChild(bioEl);
+
+        if (funFact) {
+          const funSection = document.createElement('section');
+          funSection.className = 'team-card__fun';
+
+          const funTitle = document.createElement('h4');
+          funTitle.className = 'team-card__fun-title';
+          funTitle.textContent = 'Fun Fact or Interests';
+
+          const funText = document.createElement('p');
+          funText.className = 'team-card__fun-text';
+          funText.textContent = funFact;
+
+          funSection.appendChild(funTitle);
+          funSection.appendChild(funText);
+          body.appendChild(funSection);
+        }
 
         if (email) {
           const emailEl = document.createElement('a');
