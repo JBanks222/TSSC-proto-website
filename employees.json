@@ -1,0 +1,147 @@
+{
+  "employees": [
+    {
+      "First Name": "Vladimir",
+      "Last Name": "Francois",
+      "Title": "IT Assistant I",
+      "Year Started": "",
+      "Role & Contributions": "Supports daily service desk operations, ticket triage, and frontline troubleshooting for students and faculty.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys solving workflow and tech support challenges.",
+      "Email": "vladimir.francois@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Sanjay",
+      "Last Name": "Ramnauth",
+      "Title": "IT Associate I",
+      "Year Started": "",
+      "Role & Contributions": "Provides frontline technical support and assists with service desk requests, account access, and issue resolution.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in practical IT problem-solving and user support.",
+      "Email": "CRamnauth@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Richard",
+      "Last Name": "Shivtahal",
+      "Title": "IT Associate I",
+      "Year Started": "",
+      "Role & Contributions": "Supports endpoint troubleshooting, software support, and student/faculty service requests.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys hands-on technical troubleshooting.",
+      "Email": "RShivtahal@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Stephen",
+      "Last Name": "Ulysse",
+      "Title": "IT Support Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Provides support for classroom and student technology issues, account access, and service desk operations.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in education technology and digital tools.",
+      "Email": "stephen.ulysse@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Feroze",
+      "Last Name": "Ahamed",
+      "Title": "IT Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Supports end users with hardware/software issues and contributes to daily help desk ticket workflows.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys helping users feel confident with technology.",
+      "Email": "FAhamed@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Katrina",
+      "Last Name": "Phillips",
+      "Title": "Manager",
+      "Year Started": "",
+      "Role & Contributions": "Leads service desk operations, coordinates support priorities, and helps ensure reliable IT service delivery.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Passionate about team development and high-quality support.",
+      "Email": "katrina.phillips@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Jalen",
+      "Last Name": "Banks",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "2024",
+      "Role & Contributions": "Jalen helps students, faculty, and staff with everyday tech issues at the QCC IT Help Desk, such as fixing login problems, troubleshooting devices, and answering general technology questions. He also helps improve some of the college’s websites and digital tools to make them easier to use and more accessible for everyone.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk / Strategic Initiatives & Digital Transformation",
+      "Fun Fact or Interests": "Jalen enjoys art, music, and nature. Occasional rock climber ",
+      "Email": "jalen.banks@qcc.cuny.edu"
+    },
+    {
+      "First Name": "David",
+      "Last Name": "Adenukasi",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Assists with help desk intake, user support, and troubleshooting across campus technology services.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in endpoint support and process efficiency.",
+      "Email": "david.adenukasi@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Tamera",
+      "Last Name": "Daniels",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Supports students and faculty with technical incidents, account concerns, and service desk requests.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys delivering friendly, clear support experiences.",
+      "Email": "tamera.daniels@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Bryan",
+      "Last Name": "Johnson",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Helps troubleshoot hardware and software issues and supports daily user assistance workflows.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in learning new support tools and workflows.",
+      "Email": "bryan.johnson@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Alexis",
+      "Last Name": "Ford",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Provides user support and assists with resolving day-to-day technical requests across supported systems.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys helping users translate tech problems into solutions.",
+      "Email": "alexis.ford@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Bradley",
+      "Last Name": "Balkaran",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Supports help desk service delivery, incident response, and user troubleshooting.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in customer-focused technology support.",
+      "Email": "bradley.balkaran@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Arafat",
+      "Last Name": "Sami",
+      "Title": "Tech Fee (college assistant)",
+      "Year Started": "",
+      "Role & Contributions": "Assists with campus technology support requests and contributes to daily service desk coverage.",
+      "Photo": "headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys practical troubleshooting and user support.",
+      "Email": "arafat.sami@qcc.cuny.edu"
+    }
+  ]
+}

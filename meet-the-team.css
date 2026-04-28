@@ -1,0 +1,599 @@
+/*
+ * meet-the-team.css
+ * Styles specific to the Meet the Team page.
+ * Global design tokens and shared components live in styles.css.
+ *
+ * MASK EFFECT – static (all users)
+ * ──────────────────────────────────
+ * .mask-text uses background-clip: text + -webkit-text-fill-color: transparent
+ * to clip a CSS gradient to the letterforms. Text remains a real DOM node,
+ * fully selectable and readable by screen readers.
+ *
+ * ANIMATED EFFECT – motion users only
+ * ─────────────────────────────────────
+ * Inspired by humansand.ai: when prefers-reduced-motion: no-preference,
+ * three layered effects activate on the hero heading:
+ *
+ *  1. gradient-sweep  – a wide (300%) multi-stop aurora gradient whose
+ *     background-position animates left→right, creating a slow light-sweep
+ *     through the letterforms. Easing: ease-in-out, 5 s, infinite alternate.
+ *
+ *  2. orb-drift-a / orb-drift-b – two radial-gradient orbs in the hero
+ *     backdrop animate their positions via CSS custom-property tweening,
+ *     giving the background a slow breathing/aurora feel.
+ *
+ *  3. hero-reveal – the h1 fades up from 24 px below on page load (0.6 s),
+ *     so the heading appears to emerge from the background, matching the
+ *     cinematic reveal style of AI-brand hero sections.
+ *
+ * All three are scoped inside @media (prefers-reduced-motion: no-preference)
+ * so users who prefer reduced motion see only the static gradient.
+ *
+ * Contrast: gradient stops (white, gold-400) both meet WCAG AA on the
+ * dark navy hero background.
+ */
+
+/* ==========================================================================
+   Mask-text utility
+   ========================================================================== */
+.mask-text {
+  /* Gradient travels diagonally: navy at top-left → gold at bottom-right */
+  background: linear-gradient(
+    135deg,
+    var(--navy-900) 0%,
+    var(--navy-800) 40%,
+    var(--gold-500) 100%
+  );
+
+  /* Clip the background to the text shape */
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  /* Make the default text color transparent so the gradient shows through */
+  -webkit-text-fill-color: transparent;
+  color: var(--navy-950); /* plain-color fallback for unsupporting browsers */
+}
+
+/* ==========================================================================
+   Page hero / header
+   ========================================================================== */
+.team-hero {
+  position: relative;
+  overflow: clip;
+  padding: 5.5rem 0 4.5rem;
+  background:
+    linear-gradient(135deg, rgba(15, 50, 102, 0.98), rgba(19, 63, 125, 0.94)),
+    linear-gradient(180deg, rgba(240, 179, 35, 0.24), transparent 60%);
+  color: var(--white);
+}
+
+/*
+ * The backdrop contains two absolutely-positioned orb <div>s that can be
+ * independently animated. The parent is overflow:clip so nothing bleeds out.
+ * Static fallback: the orbs are visible as soft radial glows even without
+ * animation — identical to the home page hero backdrop look.
+ */
+.team-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Soft base layer — always visible */
+  background:
+    radial-gradient(circle at 12% 20%, rgba(255, 201, 77, 0.12), transparent 20%),
+    radial-gradient(circle at 85% 78%, rgba(255, 255, 255, 0.06), transparent 20%);
+}
+
+/* Individual orb elements (added to HTML) */
+.team-hero__orb-a,
+.team-hero__orb-b {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  /* will-change prepares the compositor for the transform animation */
+  will-change: transform;
+}
+
+.team-hero__orb-a {
+  width: 36rem;
+  height: 36rem;
+  top: -8rem;
+  left: -6rem;
+  background: radial-gradient(circle, rgba(255, 201, 77, 0.22) 0%, transparent 70%);
+}
+
+.team-hero__orb-b {
+  width: 28rem;
+  height: 28rem;
+  bottom: -6rem;
+  right: -4rem;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.team-hero__canvas {
+  /* Fills the hero section, sits above the backdrop but below text content */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* mouse events fall through to real content */
+  z-index: 1;
+  /* Hidden by default; JS enables it only when motion is allowed */
+  display: none;
+}
+
+.team-hero__inner {
+  position: relative;
+  z-index: 2; /* text layer above canvas */
+  max-width: 46rem;
+}
+
+/* Override: in the hero context the heading uses a light gradient
+   (white → off-white → gold) so it reads against the dark navy background.
+   Static version used by all users, including those who prefer reduced motion. */
+.team-hero .mask-text {
+  background: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.9) 35%,
+    var(--gold-400) 60%,
+    #ffffff 80%,
+    rgba(255, 201, 77, 0.8) 100%
+  );
+  background-size: 300% 100%; /* oversized so the sweep has room to travel */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--white); /* plain-color fallback */
+}
+
+.team-hero__inner h1 {
+  margin: 0;
+  font-family: "Merriweather", serif;
+  font-size: clamp(2.75rem, 6vw, 4.2rem);
+  line-height: 1.05;
+}
+
+/* --------------------------------------------------------------------------
+   ANIMATED EFFECTS — only when the user allows motion
+   prefers-reduced-motion: no-preference means "I'm fine with motion"
+   -------------------------------------------------------------------------- */
+
+/*
+ * Keyframe 1 – gradient-sweep
+ * Slides the oversized background left→right so the gradient
+ * appears to slowly flow through the text letterforms.
+ * background-position: 0% = gradient start at left edge
+ *                     100% = gradient start shifted fully right
+ */
+@keyframes gradient-sweep {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/*
+ * Keyframe 2 – hero-reveal
+ * Fades the heading up from slight offset on load.
+ * Mimics the cinematic entrance seen on AI-brand hero sections.
+ */
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+ * Keyframe 3a / 3b – orb drift
+ * Two backdrop orbs drift slowly on independent paths,
+ * creating a breathing aurora behind the hero text.
+ */
+@keyframes orb-drift-a {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(3%, 2%) scale(1.08); }
+  66%  { transform: translate(-2%, 4%) scale(0.96); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes orb-drift-b {
+  0%   { transform: translate(0, 0) scale(1); }
+  40%  { transform: translate(-4%, -3%) scale(1.1); }
+  70%  { transform: translate(3%, -1%) scale(0.94); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. Animated gradient sweep through the heading text */
+  .team-hero .mask-text {
+    animation: gradient-sweep 5s ease-in-out infinite alternate;
+  }
+
+  /* 2. Cinematic fade-up reveal for the heading on page load */
+  .team-hero__inner h1 {
+    animation: hero-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Stagger the eyebrow and copy in after the heading */
+  .team-hero__inner .eyebrow {
+    animation: hero-reveal 0.6s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .team-hero__copy {
+    animation: hero-reveal 0.6s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* 3. Drifting orbs in the hero backdrop */
+  .team-hero__orb-a {
+    animation: orb-drift-a 12s ease-in-out infinite;
+  }
+
+  .team-hero__orb-b {
+    animation: orb-drift-b 16s ease-in-out infinite;
+  }
+}
+
+.team-hero__copy {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+/* ==========================================================================
+   Team grid
+   ========================================================================== */
+.team-section {
+  background: transparent; /* inherits the page body gradient */
+}
+
+/*
+ * Grid layout:
+ *   Single column at all breakpoints so each card occupies its own row.
+ */
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.team-grid > li {
+  display: flex;
+  width: min(100%, 46rem);
+}
+
+.team-grid-status {
+  margin: 1rem 0 0;
+  color: var(--ink-700);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Team member card
+   ========================================================================== */
+.team-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 40rem;
+  height: 40rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(20, 63, 125, 0.12);
+  box-shadow: var(--shadow-md);
+  /* Smooth lift on hover/focus — motion is static so no reduced-motion
+     concern, but we keep the transition subtle (180 ms). */
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+/* Hover + keyboard-focus lift */
+.team-card:hover,
+.team-card:focus {
+  transform: translateY(-4px);
+  border-color: rgba(20, 63, 125, 0.28);
+}
+
+/* Visible focus ring for keyboard navigation (WCAG 2.4.7) */
+.team-card:focus-visible {
+  outline: 3px solid rgba(255, 201, 77, 0.85);
+  outline-offset: 3px;
+}
+
+/* Remove the default :focus ring so only :focus-visible shows */
+.team-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------
+   Photo
+   -------------------------------------------------------------------------- */
+.team-card__photo-wrap {
+  flex: 1 1 58%;
+  min-height: 12rem;
+}
+
+.team-card__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center 20%;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Card body text
+   -------------------------------------------------------------------------- */
+.team-card__body {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-rows: auto auto 1fr auto auto;
+  align-content: start;
+  flex: 1 1 42%;
+  padding: 0.9rem 1.1rem 1rem;
+}
+
+/*
+ * Name: .mask-text is applied in HTML. The gradient (navy → gold) has
+ * sufficient contrast against the white card background at this font size.
+ */
+.team-card__name {
+  margin: 0;
+  font-family: "Merriweather", serif;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.team-card__role {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+}
+
+.team-card__bio {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-700);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.team-card__fun {
+  margin-top: 0.2rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(20, 63, 125, 0.14);
+}
+
+.team-card__fun-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-700);
+}
+
+.team-card__fun-text {
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink-700);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.team-card__email {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--navy-900);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-card__email:hover,
+.team-card__email:focus-visible {
+  color: var(--navy-800);
+}
+
+.team-card__email:focus-visible {
+  outline: 3px solid rgba(255, 201, 77, 0.85);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Responsive breakpoints
+   ========================================================================== */
+
+/* Tablet / medium: 2-column grid already handles this well.
+   At < 900 px keep 2 columns but let cards stack vertically if needed. */
+@media (max-width: 900px) {
+  .team-card {
+    min-height: 36rem;
+    height: 36rem;
+  }
+}
+
+/* Keep single-column layout on narrow phones */
+@media (max-width: 600px) {
+  .team-hero__inner h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Defined breakpoint: allow long text to wrap onto the next line cleanly */
+@media (max-width: 760px) {
+  .team-grid > li {
+    width: 100%;
+  }
+
+  .team-card__email {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+}
+
+/* ==========================================================================
+   Navigation: active page indicator
+   ========================================================================== */
+.main-nav a[aria-current="page"] {
+  color: var(--navy-900);
+  font-weight: 700;
+  border-bottom: 2px solid var(--gold-500);
+  padding-bottom: 2px;
+}
+
+/* ==========================================================================
+   Accessibility: "Reduce motion" toggle switch
+   ========================================================================== */
+
+/*
+ * The button floats fixed at the bottom-right corner so it is permanently
+ * reachable regardless of scroll position. It uses role="switch" +
+ * aria-checked in the HTML, so screen readers announce it as:
+ *   "Reduce motion, switch, off" / "Reduce motion, switch, on"
+ *
+ * Visual design:
+ *   - Matches the site's navy/gold palette
+ *   - thumb slides left (off) → right (on) via CSS transform
+ *   - aria-checked="true" on the button drives all state via an attribute
+ *     selector so no extra JS class toggling is needed for the visuals
+ */
+.motion-toggle {
+  /* Fixed position — always accessible */
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  padding: 0.55rem 0.9rem 0.55rem 0.6rem;
+  border: 1px solid rgba(20, 63, 125, 0.22);
+  border-radius: 999px;
+  background: rgba(247, 243, 234, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(12, 34, 69, 0.14);
+
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy-950);
+  cursor: pointer;
+
+  /* Smooth appearance — excluded from the no-motion override intentionally
+     because this button IS the motion control; animating it would be ironic
+     if it were frozen. The transition is only on box-shadow/border. */
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.motion-toggle:hover {
+  border-color: rgba(20, 63, 125, 0.42);
+  box-shadow: 0 6px 24px rgba(12, 34, 69, 0.2);
+}
+
+.motion-toggle:focus-visible {
+  outline: 3px solid rgba(255, 201, 77, 0.85);
+  outline-offset: 3px;
+}
+
+/* The pill-shaped track */
+.motion-toggle__track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 2.4rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  background: rgba(20, 63, 125, 0.18);
+  border: 1px solid rgba(20, 63, 125, 0.22);
+  flex-shrink: 0;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+/* Circular thumb inside the track */
+.motion-toggle__thumb {
+  position: absolute;
+  left: 0.18rem;
+  width: 0.98rem;
+  height: 0.98rem;
+  border-radius: 50%;
+  background: var(--navy-900);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              background   200ms ease;
+}
+
+/* ── ON state: aria-checked="true" ──────────────────────────────────────── */
+.motion-toggle[aria-checked="true"] .motion-toggle__track {
+  background: var(--gold-500);
+  border-color: var(--gold-400);
+}
+
+.motion-toggle[aria-checked="true"] .motion-toggle__thumb {
+  transform: translateX(1.05rem);
+  background: var(--navy-950);
+}
+
+/* Label text */
+.motion-toggle__label {
+  white-space: nowrap;
+  user-select: none;
+  line-height: 1;
+}
+
+/* ==========================================================================
+   no-motion overrides — applied when user toggles "Reduce motion" ON
+   Also inherits from prefers-reduced-motion: reduce via the early-init
+   script which adds .no-motion to <html> before first paint.
+
+   !important is intentional: this is a user preference override, and
+   it must win over any specificity battle with animation declarations.
+   ========================================================================== */
+.no-motion *,
+.no-motion *::before,
+.no-motion *::after {
+  animation-duration:        0.01ms !important;
+  animation-iteration-count: 1      !important;
+  transition-duration:       0.01ms !important;
+  scroll-behavior:           auto   !important;
+}
+
+/* Hide the particle canvas entirely */
+.no-motion .team-hero__canvas {
+  display: none !important;
+}
+
+/* Reset gradient background-position to the static start */
+.no-motion .team-hero .mask-text {
+  background-position: 0% 50% !important;
+}
+
