@@ -22,13 +22,31 @@
       const data = await response.json();
       const employees = Array.isArray(data.employees) ? data.employees : [];
       const sortedEmployees = employees.slice().sort(function (a, b) {
+        const titleA = typeof a.Title === 'string' ? a.Title.trim().toLowerCase() : '';
+        const titleB = typeof b.Title === 'string' ? b.Title.trim().toLowerCase() : '';
+        const isManagerA = titleA.includes('manager');
+        const isManagerB = titleB.includes('manager');
+        const isPriorityA = titleA.includes('associate') || titleA.includes('support assistant');
+        const isPriorityB = titleB.includes('associate') || titleB.includes('support assistant');
+
+        var sortGroupA = isManagerA ? 0 : (isPriorityA ? 1 : 2);
+        var sortGroupB = isManagerB ? 0 : (isPriorityB ? 1 : 2);
+
+        if (sortGroupA !== sortGroupB) {
+          return sortGroupA - sortGroupB;
+        }
+
         const firstA = typeof a['First Name'] === 'string' ? a['First Name'].trim() : '';
         const lastA = typeof a['Last Name'] === 'string' ? a['Last Name'].trim() : '';
         const firstB = typeof b['First Name'] === 'string' ? b['First Name'].trim() : '';
         const lastB = typeof b['Last Name'] === 'string' ? b['Last Name'].trim() : '';
-        const nameA = (firstA + ' ' + lastA).trim() || (typeof a.name === 'string' ? a.name.trim() : '');
-        const nameB = (firstB + ' ' + lastB).trim() || (typeof b.name === 'string' ? b.name.trim() : '');
-        return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+
+        const lastNameCompare = lastA.localeCompare(lastB, undefined, { sensitivity: 'base' });
+        if (lastNameCompare !== 0) {
+          return lastNameCompare;
+        }
+
+        return firstA.localeCompare(firstB, undefined, { sensitivity: 'base' });
       });
 
       if (sortedEmployees.length === 0) {
