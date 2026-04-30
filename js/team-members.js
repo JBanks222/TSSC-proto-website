@@ -2,40 +2,41 @@
   'use strict';
 
   /**
-   * Renders team cards from employees.json.
+  * Renders team cards from data/full-part-time.json and data/tech-fees.json.
    * All text is inserted with textContent to avoid HTML injection.
    */
   async function loadTeamMembers () {
-    const grid = document.getElementById('teamGrid');
+    const facultyGrid = document.getElementById('facultyGrid');
+    const techFeesGrid = document.getElementById('techFeesGrid');
     const status = document.getElementById('teamGridStatus');
 
-    if (!grid || !status) return;
+    if (!facultyGrid || !techFeesGrid || !status) return;
 
     status.textContent = 'Loading team directory...';
 
     try {
-      const response = await fetch('employees.json', { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error('Failed to load team data (' + response.status + ')');
+      const [fullPartTimeResponse, techFeesResponse] = await Promise.all([
+        fetch('data/full-part-time.json', { cache: 'no-store' }),
+        fetch('data/tech-fees.json', { cache: 'no-store' })
+      ]);
+
+      if (!fullPartTimeResponse.ok || !techFeesResponse.ok) {
+        throw new Error(
+          'Failed to load team data (' + fullPartTimeResponse.status + ', ' + techFeesResponse.status + ')'
+        );
       }
 
-      const data = await response.json();
-      const employees = Array.isArray(data.employees) ? data.employees : [];
-      const sortedEmployees = employees.slice().sort(function (a, b) {
-        const titleA = typeof a.Title === 'string' ? a.Title.trim().toLowerCase() : '';
-        const titleB = typeof b.Title === 'string' ? b.Title.trim().toLowerCase() : '';
-        const isManagerA = titleA.includes('manager');
-        const isManagerB = titleB.includes('manager');
-        const isPriorityA = titleA.includes('associate') || titleA.includes('support assistant');
-        const isPriorityB = titleB.includes('associate') || titleB.includes('support assistant');
-
-        var sortGroupA = isManagerA ? 0 : (isPriorityA ? 1 : 2);
-        var sortGroupB = isManagerB ? 0 : (isPriorityB ? 1 : 2);
-
-        if (sortGroupA !== sortGroupB) {
-          return sortGroupA - sortGroupB;
-        }
-
+      const [fullPartTimeData, techFeesData] = await Promise.all([
+        fullPartTimeResponse.json(),
+        techFeesResponse.json()
+      ]);
+      const fullPartTimeEmployees = Array.isArray(fullPartTimeData.employees)
+        ? fullPartTimeData.employees
+        : [];
+      const techFeeEmployees = Array.isArray(techFeesData.employees)
+        ? techFeesData.employees
+        : [];
+      const sortedTechFeeEmployees = techFeeEmployees.slice().sort(function (a, b) {
         const firstA = typeof a['First Name'] === 'string' ? a['First Name'].trim() : '';
         const lastA = typeof a['Last Name'] === 'string' ? a['Last Name'].trim() : '';
         const firstB = typeof b['First Name'] === 'string' ? b['First Name'].trim() : '';
@@ -49,14 +50,15 @@
         return firstA.localeCompare(firstB, undefined, { sensitivity: 'base' });
       });
 
-      if (sortedEmployees.length === 0) {
+      if (fullPartTimeEmployees.length === 0 && sortedTechFeeEmployees.length === 0) {
         status.textContent = 'No team members are listed yet.';
         return;
       }
 
-      const fragment = document.createDocumentFragment();
+      const facultyFragment = document.createDocumentFragment();
+      const techFeesFragment = document.createDocumentFragment();
 
-      sortedEmployees.forEach(function (employee) {
+      function appendEmployeeCard (fragment, employee) {
         const firstName = typeof employee['First Name'] === 'string' ? employee['First Name'].trim() : '';
         const lastName = typeof employee['Last Name'] === 'string' ? employee['Last Name'].trim() : '';
         const name = (firstName + ' ' + lastName).trim() ||
@@ -86,7 +88,7 @@
           ? employee['Photo'].trim()
           : (typeof employee.headshot === 'string' ? employee.headshot.trim() : '');
         const isCameraShy = photoRaw.toLowerCase() === 'camera shy';
-        const headshot = (isCameraShy || !photoRaw) ? 'headshots/placeholder.png' : photoRaw;
+        const headshot = (isCameraShy || !photoRaw) ? 'assets/headshots/placeholder.png' : photoRaw;
         const email = typeof employee.Email === 'string'
           ? employee.Email.trim()
           : (typeof employee.email === 'string' ? employee.email.trim() : '');
@@ -163,13 +165,26 @@
         article.appendChild(body);
         li.appendChild(article);
         fragment.appendChild(li);
+      }
+
+      fullPartTimeEmployees.forEach(function (employee) {
+        appendEmployeeCard(facultyFragment, employee);
       });
 
-      grid.innerHTML = '';
-      grid.appendChild(fragment);
+      sortedTechFeeEmployees.forEach(function (employee) {
+        appendEmployeeCard(techFeesFragment, employee);
+      });
 
-      const count = grid.children.length;
-      status.textContent = count + ' team member' + (count === 1 ? '' : 's') + ' loaded.';
+      facultyGrid.innerHTML = '';
+      facultyGrid.appendChild(facultyFragment);
+      techFeesGrid.innerHTML = '';
+      techFeesGrid.appendChild(techFeesFragment);
+
+      const facultyCount = facultyGrid.children.length;
+      const techFeeCount = techFeesGrid.children.length;
+      const totalCount = facultyCount + techFeeCount;
+      status.textContent = totalCount + ' team member' + (totalCount === 1 ? '' : 's') +
+        ' loaded. Faculty: ' + facultyCount + '. Tech Fees: ' + techFeeCount + '.';
     } catch (error) {
       status.textContent = 'Unable to load team directory right now.';
       console.error(error);

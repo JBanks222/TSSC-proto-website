@@ -250,6 +250,23 @@
   background: transparent; /* inherits the page body gradient */
 }
 
+.team-directory-group {
+  margin-top: 2rem;
+}
+
+.team-directory-group + .team-directory-group {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(20, 63, 125, 0.18);
+}
+
+.team-directory-group h3 {
+  margin: 0 0 1.25rem;
+  font-family: "Merriweather", serif;
+  font-size: 1.35rem;
+  color: var(--navy-900);
+}
+
 /*
  * Grid layout:
  *   Single column at all breakpoints so each card occupies its own row.
@@ -371,6 +388,7 @@
   color: var(--ink-700);
   overflow: hidden;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
@@ -397,6 +415,7 @@
   color: var(--ink-700);
   overflow: hidden;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }

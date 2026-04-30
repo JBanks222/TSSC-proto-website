@@ -1,0 +1,70 @@
+{
+  "employees": [
+    {
+      "First Name": "Katrina",
+      "Last Name": "Phillips",
+      "Title": "Manager",
+      "Year Started": "",
+      "Role & Contributions": "Leads service desk operations, coordinates support priorities, and helps ensure reliable IT service delivery.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Passionate about team development and high-quality support.",
+      "Email": "katrina.phillips@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Sanjay",
+      "Last Name": "Ramnauth",
+      "Title": "IT Associate I",
+      "Year Started": "",
+      "Role & Contributions": "Provides frontline technical support and assists with service desk requests, account access, and issue resolution.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in practical IT problem-solving and user support.",
+      "Email": "CRamnauth@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Richard",
+      "Last Name": "Shivtahal",
+      "Title": "IT Associate I",
+      "Year Started": "",
+      "Role & Contributions": "Supports endpoint troubleshooting, software support, and student/faculty service requests.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys hands-on technical troubleshooting.",
+      "Email": "RShivtahal@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Vladimir",
+      "Last Name": "Francois",
+      "Title": "IT Assistant I",
+      "Year Started": "",
+      "Role & Contributions": "Supports daily service desk operations, ticket triage, and frontline troubleshooting for students and faculty.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys solving workflow and tech support challenges.",
+      "Email": "vladimir.francois@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Stephen",
+      "Last Name": "Ulysse",
+      "Title": "IT Support Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Provides support for classroom and student technology issues, account access, and service desk operations.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in education technology and digital tools.",
+      "Email": "stephen.ulysse@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Feroze",
+      "Last Name": "Ahamed",
+      "Title": "IT Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Supports end users with hardware/software issues and contributes to daily help desk ticket workflows.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys helping users feel confident with technology.",
+      "Email": "FAhamed@qcc.cuny.edu"
+    }
+  ]
+}

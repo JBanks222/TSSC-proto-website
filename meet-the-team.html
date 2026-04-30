@@ -14,8 +14,8 @@
       href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="meet-the-team.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/meet-the-team.css" />
     <!--
       Early-init: read the saved animation preference BEFORE first paint so
       the page never flickers from animated → still. Runs inline, no delay.
@@ -122,18 +122,26 @@
         <div class="container">
           <div class="section-heading">
             <p class="eyebrow">IT Staff directory</p>
-            <h2 id="team-grid-heading">The people behind your support</h2>
+            <h2 id="team-grid-heading">The people behind the desk</h2>
             <p>
-              Each member of the TSSC team brings specialized expertise to
+              Every Faculty, Staff, and Student alike brings specialized expertise to
               make campus technology accessible to every student and faculty member.
             </p>
           </div>
 
           <!--
-            Dynamic list target. team-members.js creates each list item from
-            employees.json on page load.
+            Dynamic list targets. team-members.js creates each list item from
+            full-part-time.json and tech-fees.json on page load.
           -->
-          <ul class="team-grid" id="teamGrid" role="list"></ul>
+          <section class="team-directory-group" aria-labelledby="faculty-grid-heading">
+            <h3 id="faculty-grid-heading">Faculty</h3>
+            <ul class="team-grid" id="facultyGrid" role="list"></ul>
+          </section>
+
+          <section class="team-directory-group" aria-labelledby="tech-fees-grid-heading">
+            <h3 id="tech-fees-grid-heading">Tech Fees</h3>
+            <ul class="team-grid" id="techFeesGrid" role="list"></ul>
+          </section>
 
           <p class="team-grid-status" id="teamGridStatus" aria-live="polite"></p>
         </div>
@@ -172,8 +180,8 @@
       <span class="motion-toggle__label">Reduce&nbsp;motion</span>
     </button>
 
-    <script src="team-members.js"></script>
-    <script src="team-particles.js"></script>
+    <script src="js/team-members.js"></script>
+    <script src="js/team-particles.js"></script>
     <script>
       /* ── Animation toggle ─────────────────────────────────────────────
          Manages the manual "Reduce motion" switch.
