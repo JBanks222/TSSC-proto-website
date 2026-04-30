@@ -1,0 +1,70 @@
+{
+  "employees": [
+    {
+      "First Name": "Katrina",
+      "Last Name": "Phillips",
+      "Title": "Manager",
+      "Year Started": "Since: 2001",
+      "Role & Contributions": "Leads a team of IT professionals supporting the QCC campus' Service Desk for students, faculty, and staff. Oversee day-to-day operations, hiring, training, and team development, while working to improve how IT services are delivered through better workflows and processes. Partners with campus departments and leadership on technology projects, system rollouts, and service improvements, with a focus on making support more efficient, reliable, and user-friendly. Also focused on building a collaborative, supportive environment for both staff and users.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Full-time mom who enjoys staying active—whether it’s rock climbing, lifting, spinning, or cardio at the gym. Loves scrapbooking, traveling, gaming when time allows, and unwinding with a good movie or book. Also enjoy bowling, cooking, and spending quality time with my children, friends, and family. Known for having a fun, playful side and keeping things neat and organized (but not a germaphobe).",
+      "Email": "katrina.phillips@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Sanjay",
+      "Last Name": "Ramnauth",
+      "Title": "IT Associate I",
+      "Year Started": "Since 2015",
+      "Role & Contributions": "IT support professional experienced in troubleshooting hardware and software across Windows and macOS systems. Skilled in system maintenance, device imaging, deployments, and upgrades, with a focus on keeping operations running smoothly. Provides reliable desktop support, manages technical issues through ticketing systems, and contributes to initiatives that improve efficiency and user experience.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Detail-oriented and big on keeping things organized, clean, and running smoothly. I enjoy connecting with people, building relationships, and I’m always up for a good conversation—especially if it involves the New York Yankees."
+      "Email": "CRamnauth@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Richard",
+      "Last Name": "Shivtahal",
+      "Title": "IT Associate I",
+      "Year Started": "",
+      "Role & Contributions": "Supports endpoint troubleshooting, software support, and student/faculty service requests.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys hands-on technical troubleshooting.",
+      "Email": "RShivtahal@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Vladimir",
+      "Last Name": "Francois",
+      "Title": "IT Assistant I",
+      "Year Started": "",
+      "Role & Contributions": "Supports daily service desk operations, ticket triage, and frontline troubleshooting for students and faculty.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys solving workflow and tech support challenges.",
+      "Email": "vladimir.francois@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Stephen",
+      "Last Name": "Ulysse",
+      "Title": "IT Support Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Provides support for classroom and student technology issues, account access, and service desk operations.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Interested in education technology and digital tools.",
+      "Email": "stephen.ulysse@qcc.cuny.edu"
+    },
+    {
+      "First Name": "Feroze",
+      "Last Name": "Ahamed",
+      "Title": "IT Assistant",
+      "Year Started": "",
+      "Role & Contributions": "Supports end users with hardware/software issues and contributes to daily help desk ticket workflows.",
+      "Photo": "assets/headshots/placeholder.png",
+      "Department/Team": "Service Desk",
+      "Fun Fact or Interests": "Enjoys helping users feel confident with technology.",
+      "Email": "FAhamed@qcc.cuny.edu"
+    }
+  ]
+}
