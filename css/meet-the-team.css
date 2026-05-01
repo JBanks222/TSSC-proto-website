@@ -301,8 +301,8 @@
   gap: 0;
   padding: 0;
   width: 100%;
-  min-height: 40rem;
-  height: 40rem;
+  min-height: 43rem;
+  height: auto;
   overflow: hidden;
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.82);
@@ -388,8 +388,8 @@
   color: var(--ink-700);
   overflow: hidden;
   display: -webkit-box;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
+  line-clamp: 6;
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
 }
 
@@ -415,8 +415,8 @@
   color: var(--ink-700);
   overflow: hidden;
   display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 
@@ -452,8 +452,8 @@
    At < 900 px keep 2 columns but let cards stack vertically if needed. */
 @media (max-width: 900px) {
   .team-card {
-    min-height: 34rem;
-    height: 34rem;
+    min-height: 37rem;
+    height: auto;
   }
 }
 
