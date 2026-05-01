@@ -452,8 +452,8 @@
    At < 900 px keep 2 columns but let cards stack vertically if needed. */
 @media (max-width: 900px) {
   .team-card {
-    min-height: 36rem;
-    height: 36rem;
+    min-height: 34rem;
+    height: 34rem;
   }
 }
 
@@ -470,10 +470,58 @@
     width: 100%;
   }
 
+  .team-card {
+    min-height: 0;
+    height: auto;
+  }
+
+  .team-card__photo-wrap {
+    min-height: 15rem;
+    max-height: 19rem;
+  }
+
+  .team-card__body {
+    padding: 0.95rem 1rem 1rem;
+  }
+
   .team-card__email {
     white-space: normal;
     overflow-wrap: anywhere;
     text-overflow: clip;
+  }
+}
+
+@media (max-width: 480px) {
+  .team-hero__inner h1 {
+    font-size: 2.05rem;
+  }
+
+  .team-hero__copy {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .team-directory-group {
+    margin-top: 1.4rem;
+  }
+
+  .team-directory-group + .team-directory-group {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+  }
+
+  .team-card__name {
+    font-size: 1.12rem;
+  }
+
+  .team-card__role {
+    font-size: 0.8rem;
+  }
+
+  .team-card__bio,
+  .team-card__fun-text,
+  .team-card__email {
+    font-size: 0.9rem;
   }
 }
 
