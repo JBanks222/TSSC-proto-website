@@ -112,8 +112,13 @@
   }
 
   .tfa-form-wrap {
+    min-height: 26rem;
     padding: 1.2rem;
     border-radius: var(--radius-md);
+  }
+
+  .tfa-form-wrap iframe {
+    min-height: 24rem;
   }
 }
 
@@ -127,6 +132,11 @@
   }
 
   .tfa-form-wrap {
+    min-height: auto;
     padding: 0.9rem;
+  }
+
+  .tfa-form-wrap iframe {
+    min-height: 20rem;
   }
 }
