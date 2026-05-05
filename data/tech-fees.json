@@ -15,22 +15,22 @@
       "First Name": "David",
       "Last Name": "Adenukasi",
       "Title": "Tech Fee (college assistant)",
-      "Year Started": "",
-      "Role & Contributions": "Assists with help desk intake, user support, and troubleshooting across campus technology services.",
+      "Year Started": "2025",
+      "Role & Contributions": "David is an entry-level IT Support Assistant who helps students and faculty resolve technical issues and troubleshoot system problems. He is enthusiastic about assisting others and takes pride in guiding users step-by-step through solutions to build their confidence and technical skills.",
       "Photo": "assets/headshots/placeholder.png",
       "Department/Team": "Service Desk",
-      "Fun Fact or Interests": "Interested in endpoint support and process efficiency.",
+      "Fun Fact or Interests": "In his free time, David enjoys reading his Bible, watching anime, keeping up with sports—especially the NFL and NBA—and listening to music.",
       "Email": "david.adenukasi@qcc.cuny.edu"
     },
     {
       "First Name": "Tamera",
       "Last Name": "Daniels",
       "Title": "Tech Fee (college assistant)",
-      "Year Started": "",
-      "Role & Contributions": "Supports students and faculty with technical incidents, account concerns, and service desk requests.",
+      "Year Started": "2026",
+      "Role & Contributions": "I support the QCC community by assisting students, faculty, and staff with a range of technical issues. This includes helping with password resets, resolving MFA (multi-factor authentication) challenges, and ensuring email accounts are accurate and up to date. I’m committed to providing clear, reliable support that helps users quickly regain access and stay connected.",
       "Photo": "assets/headshots/placeholder.png",
       "Department/Team": "Service Desk",
-      "Fun Fact or Interests": "Enjoys delivering friendly, clear support experiences.",
+      "Fun Fact or Interests": "I appreciate math in theory… in practice, it’s a different story.",
       "Email": "tamera.daniels@qcc.cuny.edu"
     },
     {
@@ -48,11 +48,11 @@
       "First Name": "Alexis",
       "Last Name": "Ford",
       "Title": "Tech Fee (college assistant)",
-      "Year Started": "",
-      "Role & Contributions": "Provides user support and assists with resolving day-to-day technical requests across supported systems.",
+      "Year Started": "2024",
+      "Role & Contributions": "I provide technical support to students, faculty, and staff both in person and remotely. I assist with platforms like CUNYfirst, Outlook, Tiger ID, and general account access, helping troubleshoot login and system-related issues. I also manage and resolve service tickets and offer phone support, working to ensure efficient, reliable service and a smooth experience for everyone.",
       "Photo": "assets/headshots/placeholder.png",
       "Department/Team": "Service Desk",
-      "Fun Fact or Interests": "Enjoys helping users translate tech problems into solutions.",
+      "Fun Fact or Interests": "I enjoy working on small tech projects and tutoring CSEC IT. Outside of tech, I have a strong passion for music—I love creating covers and working on song and vocal arrangements for choirs.",
       "Email": "alexis.ford@qcc.cuny.edu"
     },
     {
@@ -70,11 +70,11 @@
       "First Name": "Arafat",
       "Last Name": "Sami",
       "Title": "Tech Fee (college assistant)",
-      "Year Started": "",
-      "Role & Contributions": "Assists with campus technology support requests and contributes to daily service desk coverage.",
+      "Year Started": "2025",
+      "Role & Contributions": "I support students, faculty, and staff at QCC with everyday technical issues, including troubleshooting account access (CUNYfirst, Outlook), Wi-Fi connectivity, and multi-factor authentication (MFA). I provide remote assistance using tools like Quick Assist and Zoom, helping resolve issues efficiently and ensuring a smooth, reliable technology experience across campus.",
       "Photo": "assets/headshots/placeholder.png",
       "Department/Team": "Service Desk",
-      "Fun Fact or Interests": "Enjoys practical troubleshooting and user support.",
+      "Fun Fact or Interests": "Arafat enjoys traveling, exploring new places, and going on exciting adventures. In his downtime, he also loves watching movies and TV shows.",
       "Email": "arafat.sami@qcc.cuny.edu"
     }
   ]
