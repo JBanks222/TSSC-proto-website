@@ -335,8 +335,12 @@
    Photo
    -------------------------------------------------------------------------- */
 .team-card__photo-wrap {
-  flex: 1 1 58%;
-  min-height: 12rem;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  overflow: hidden;
+  background: rgba(20, 63, 125, 0.05);
 }
 
 .team-card__photo {
