@@ -7,13 +7,22 @@
 /* --------------------------------------------------------------------------
    Page hero
    -------------------------------------------------------------------------- */
+
 .tfa-hero {
   position: relative;
   overflow: clip;
   padding: 5rem 0 4rem;
   background:
-    linear-gradient(135deg, rgba(15, 50, 102, 0.98), rgba(19, 63, 125, 0.94)),
-    linear-gradient(180deg, rgba(240, 179, 35, 0.24), transparent 60%);
+    linear-gradient(
+      135deg,
+      rgba(15, 50, 102, 0.98),
+      rgba(19, 63, 125, 0.94)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(240, 179, 35, 0.24),
+      transparent 60%
+    );
   color: var(--white);
 }
 
@@ -22,8 +31,16 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 10% 20%, rgba(255, 201, 77, 0.2), transparent 20%),
-    radial-gradient(circle at 88% 75%, rgba(255, 255, 255, 0.07), transparent 20%);
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(255, 201, 77, 0.2),
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 88% 75%,
+      rgba(255, 255, 255, 0.07),
+      transparent 20%
+    );
   pointer-events: none;
 }
 
@@ -50,33 +67,74 @@
 /* --------------------------------------------------------------------------
    Form section
    -------------------------------------------------------------------------- */
+
 .tfa-form-section {
   padding-top: 3rem;
   padding-bottom: 4rem;
+  width: 100%;
 }
 
 .tfa-form-wrap {
-  min-height: 32rem;
+  width: 100%;
+  min-height: 44rem;
+
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(20, 63, 125, 0.12);
   box-shadow: var(--shadow-md);
+
   padding: 2rem;
-  overflow: hidden;
+
+  /*
+    Important:
+    Do not use overflow: hidden here.
+    Third-party embeds can calculate their height dynamically,
+    especially on mobile.
+  */
+  overflow: visible;
+
+  box-sizing: border-box;
 }
 
-/* The ProcessMaker embed script may inject an <iframe> or a <div>;
-   make it fill the wrapper however it renders. */
+/*
+  ProcessMaker may inject a div, iframe, or other wrapper.
+  Make direct children respect the available width.
+*/
 .tfa-form-wrap > * {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.tfa-form-wrap iframe {
-  display: block;
-  width: 100%;
-  min-height: 30rem;
-  border: none;
+/*
+  Handle common ProcessMaker-generated wrapper elements.
+*/
+.tfa-form-wrap > div,
+.tfa-form-wrap form {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
+
+/*
+  ProcessMaker iframe styling.
+*/
+.tfa-form-wrap iframe {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  min-height: 42rem !important;
+
+  border: 0 !important;
+
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Fallback link
+   -------------------------------------------------------------------------- */
 
 .tfa-fallback {
   margin-top: 1rem;
@@ -96,8 +154,9 @@
 }
 
 /* --------------------------------------------------------------------------
-   Responsive
+   Tablet / smaller desktop
    -------------------------------------------------------------------------- */
+
 @media (max-width: 720px) {
   .tfa-hero {
     padding: 4rem 0 3rem;
@@ -111,16 +170,33 @@
     font-size: 1rem;
   }
 
+  .tfa-form-section {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+  }
+
   .tfa-form-wrap {
-    min-height: 26rem;
+    width: 100%;
+    min-height: 44rem;
+
     padding: 1.2rem;
     border-radius: var(--radius-md);
+
+    overflow: visible;
   }
 
   .tfa-form-wrap iframe {
-    min-height: 24rem;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-height: 42rem !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
 
 @media (max-width: 480px) {
   .tfa-hero {
@@ -131,12 +207,65 @@
     font-size: 1.85rem;
   }
 
+  .tfa-hero__copy {
+    font-size: 1rem;
+  }
+
+  .tfa-form-section {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+
   .tfa-form-wrap {
-    min-height: auto;
-    padding: 0.9rem;
+    /*
+      Do NOT set min-height: auto here.
+      The ProcessMaker embed may initially contain only
+      a script element, which has no visual height.
+    */
+    min-height: 44rem;
+
+    width: 100%;
+    padding: 0.75rem;
+
+    border-radius: var(--radius-md);
+
+    overflow: visible;
+
+    box-sizing: border-box;
+  }
+
+  .tfa-form-wrap > div,
+  .tfa-form-wrap form {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .tfa-form-wrap iframe {
-    min-height: 20rem;
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-height: 42rem !important;
+
+    border: 0 !important;
+  }
+
+  .tfa-fallback {
+    font-size: 0.9rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Very small phones
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 360px) {
+  .tfa-form-wrap {
+    padding: 0.5rem;
+  }
+
+  .tfa-form-wrap iframe {
+    min-height: 42rem !important;
   }
 }
