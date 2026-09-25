@@ -15,6 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/chatbot.css" />
   </head>
   <body>
     <header class="site-header">
@@ -297,6 +298,61 @@
       </div>
     </footer>
 
+    <div class="it-chat__backdrop" id="itChatBackdrop" aria-hidden="true" hidden></div>
+    <button
+      class="it-chat__launcher"
+      id="itChatLauncher"
+      type="button"
+      aria-label="Open IT Help Assistant"
+      aria-expanded="false"
+      aria-controls="itChatPanel"
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+        <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.5A7.5 7.5 0 1 1 20 11.5Z" />
+        <path d="M8 11h.01M12 11h.01M16 11h.01" />
+      </svg>
+    </button>
+
+    <section
+      class="it-chat__panel"
+      id="itChatPanel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="itChatTitle"
+      aria-hidden="true"
+      hidden
+    >
+      <header class="it-chat__header">
+        <div>
+          <h2 id="itChatTitle">IT Help Assistant</h2>
+          <p><span class="it-chat__online-dot" aria-hidden="true"></span>Online</p>
+        </div>
+        <button class="it-chat__close" id="itChatClose" type="button" aria-label="Close IT Help Assistant">
+          <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="it-chat__messages" id="itChatMessages" aria-live="polite" aria-relevant="additions text">
+        <div class="it-chat__typing" id="itChatTyping" role="status" aria-label="Assistant is typing" hidden>
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <form class="it-chat__composer" id="itChatForm">
+        <label class="visually-hidden" for="itChatInput">Message the IT Help Assistant</label>
+        <textarea id="itChatInput" rows="1" maxlength="2000" placeholder="Write a message..." required></textarea>
+        <button id="itChatSend" type="submit" aria-label="Send message">
+          <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+            <path d="m22 2-7 20-4-9-9-4Z" />
+            <path d="M22 2 11 13" />
+          </svg>
+        </button>
+      </form>
+    </section>
+
     <script src="js/script.js"></script>
+    <script src="js/chatbot.js"></script>
   </body>
 </html>
