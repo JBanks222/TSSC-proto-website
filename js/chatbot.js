@@ -1,4 +1,4 @@
-const N8N_WEBHOOK_URL = "https://jalen222.app.n8n.cloud/webhook-test/782df198-c304-498e-b5ff-9e443f0b303c";
+const N8N_WEBHOOK_URL = "https://jalen222.app.n8n.cloud/webhook/782df198-c304-498e-b5ff-9e443f0b303c";
 
 const CHAT_SESSION_KEY = "itChatSessionId";
 const CHAT_HISTORY_KEY = "itChatMessages";
