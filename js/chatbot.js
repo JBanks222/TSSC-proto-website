@@ -6,6 +6,14 @@ const CHAT_TIMEOUT_MS = 25000;
 const ASSISTANT_RESPONSE_PROPERTY = "response";
 const INITIAL_MESSAGE = "Hi! I'm the IT Help Assistant. What can I help you with today?";
 const CONNECTION_ERROR = "Sorry, I'm having trouble connecting to the IT assistant right now. Please try again in a moment.";
+const CHAT_ACTIONS = {
+  CUNY_PASSWORD_RESET: {
+    type: "link",
+    label: "Reset CUNY Password",
+    url: "https://managelogin.cuny.edu/OIMSelfService/forgotpwd"
+  }
+};
+const ACTION_TOKEN_REGEX = /\[([A-Z0-9_]+)\]/g;
 let fallbackSessionId = null;
 
 function createSessionId() {
@@ -56,6 +64,79 @@ function loadMessages() {
   return [];
 }
 
+function parseChatActions(message) {
+  if (typeof message !== "string") {
+    return {
+      cleanMessage: "",
+      actions: []
+    };
+  }
+
+  const actions = [];
+  const cleanMessage = message.replace(ACTION_TOKEN_REGEX, (match, tokenName) => {
+    const action = CHAT_ACTIONS[tokenName];
+    if (!action) {
+      return "";
+    }
+
+    const normalizedAction = {
+      type: action.type,
+      label: action.label
+    };
+
+    if (action.type === "link" && typeof action.url === "string") {
+      normalizedAction.url = action.url.trim();
+    }
+
+    if (action.type === "frontend_action" && typeof action.action === "string") {
+      normalizedAction.action = action.action.trim();
+    }
+
+    actions.push(normalizedAction);
+    return "";
+  }).replace(/\n{3,}/g, "\n\n").trim();
+
+  return {
+    cleanMessage,
+    actions
+  };
+}
+
+function createChatActionButton(action) {
+  if (!action || action.type !== "link" || typeof action.url !== "string" || !action.url.trim()) {
+    return null;
+  }
+
+  const actionLink = document.createElement("a");
+  actionLink.href = action.url;
+  actionLink.target = "_blank";
+  actionLink.rel = "noopener noreferrer";
+  actionLink.className = "it-chat__action-button";
+  actionLink.textContent = `${action.label} ↗`;
+  actionLink.setAttribute("aria-label", `${action.label} (opens in a new tab)`);
+  return actionLink;
+}
+
+function renderChatActions(actions, messageContainer) {
+  if (!Array.isArray(actions) || actions.length === 0) {
+    return;
+  }
+
+  const actionContainer = document.createElement("div");
+  actionContainer.className = "it-chat__actions";
+
+  actions.forEach((action) => {
+    const button = createChatActionButton(action);
+    if (button) {
+      actionContainer.appendChild(button);
+    }
+  });
+
+  if (actionContainer.hasChildNodes()) {
+    messageContainer.appendChild(actionContainer);
+  }
+}
+
 function initializeChatbot() {
   const launcher = document.getElementById("itChatLauncher");
   const backdrop = document.getElementById("itChatBackdrop");
@@ -92,22 +173,37 @@ function initializeChatbot() {
     messagesElement.scrollTop = messagesElement.scrollHeight;
   }
 
+  function createMessageElement(message) {
+    const messageElement = document.createElement("article");
+    messageElement.className = `it-chat__message it-chat__message--${message.role}`;
+
+    const sender = document.createElement("span");
+    sender.className = "it-chat__sender";
+    sender.textContent = message.role === "user" ? "You" : "IT Help Assistant";
+
+    const bubble = document.createElement("p");
+    bubble.className = "it-chat__bubble";
+
+    const parsedMessage = message.role === "assistant" ? parseChatActions(message.content) : {
+      cleanMessage: message.content,
+      actions: []
+    };
+
+    bubble.textContent = parsedMessage.cleanMessage;
+    messageElement.append(sender, bubble);
+
+    if (message.role === "assistant") {
+      renderChatActions(parsedMessage.actions, messageElement);
+    }
+
+    return messageElement;
+  }
+
   function addMessage(role, content) {
     const message = { role, content };
     messages.push(message);
 
-    const messageElement = document.createElement("article");
-    messageElement.className = `it-chat__message it-chat__message--${role}`;
-
-    const sender = document.createElement("span");
-    sender.className = "it-chat__sender";
-    sender.textContent = role === "user" ? "You" : "IT Help Assistant";
-
-    const bubble = document.createElement("p");
-    bubble.className = "it-chat__bubble";
-    bubble.textContent = content;
-
-    messageElement.append(sender, bubble);
+    const messageElement = createMessageElement(message);
     messagesElement.insertBefore(messageElement, typingIndicator);
     saveMessages();
     scrollToLatest();
@@ -116,18 +212,7 @@ function initializeChatbot() {
   function renderMessages() {
     messagesElement.querySelectorAll(".it-chat__message").forEach((element) => element.remove());
     messages.forEach((message) => {
-      const messageElement = document.createElement("article");
-      messageElement.className = `it-chat__message it-chat__message--${message.role}`;
-
-      const sender = document.createElement("span");
-      sender.className = "it-chat__sender";
-      sender.textContent = message.role === "user" ? "You" : "IT Help Assistant";
-
-      const bubble = document.createElement("p");
-      bubble.className = "it-chat__bubble";
-      bubble.textContent = message.content;
-
-      messageElement.append(sender, bubble);
+      const messageElement = createMessageElement(message);
       messagesElement.insertBefore(messageElement, typingIndicator);
     });
     saveMessages();
