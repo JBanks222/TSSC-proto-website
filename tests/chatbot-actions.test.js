@@ -53,6 +53,33 @@ test("parseChatActions removes recognized tokens and exposes the safe action met
   }]);
 });
 
+test("parseChatActions supports MFA choice and contact tokens", () => {
+  const result = sandbox.parseChatActions(
+    "Sure — which MFA are you having trouble with?\n\n[CUNY_MFA_TYPE]\n\nYour MFA account will need to be reset by the Technology Support & Service Center.\n\n[TSSC_MFA_RESET]"
+  );
+
+  assert.equal(result.cleanMessage, "Sure — which MFA are you having trouble with?\n\nYour MFA account will need to be reset by the Technology Support & Service Center.");
+  assert.deepEqual(JSON.parse(JSON.stringify(result.actions)), [
+    {
+      type: "choice",
+      options: [
+        { label: "Microsoft 365 MFA", value: "I need help with Microsoft 365 MFA." },
+        { label: "CUNYfirst MFA", value: "I need help with CUNYfirst MFA." }
+      ]
+    },
+    {
+      type: "contact",
+      title: "Technology Support & Service Center",
+      message: "Only the Technology Support & Service Center can reset your MFA account.",
+      phone: "718-631-6348",
+      phoneHref: "tel:+17186316348",
+      email: "ServiceDesk@qcc.cuny.edu",
+      emailHref: "mailto:ServiceDesk@qcc.cuny.edu",
+      location: "Library Building, Room L-115"
+    }
+  ]);
+});
+
 test("parseChatActions ignores unknown action-like tokens", () => {
   const result = sandbox.parseChatActions("Need help. [SOME_RANDOM_ACTION]");
 

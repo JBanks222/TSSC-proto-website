@@ -11,6 +11,55 @@ const CHAT_ACTIONS = {
     type: "link",
     label: "Reset CUNY Password",
     url: "https://managelogin.cuny.edu/OIMSelfService/forgotpwd"
+  },
+  CUNY_MFA_TYPE: {
+    type: "choice",
+    options: [
+      {
+        label: "Microsoft 365 MFA",
+        value: "I need help with Microsoft 365 MFA."
+      },
+      {
+        label: "CUNYfirst MFA",
+        value: "I need help with CUNYfirst MFA."
+      }
+    ]
+  },
+  M365_MFA_ACTION: {
+    type: "choice",
+    options: [
+      {
+        label: "Set up MFA",
+        value: "I need to set up Microsoft 365 MFA."
+      },
+      {
+        label: "Reset / change MFA",
+        value: "I need to reset or change my Microsoft 365 MFA."
+      }
+    ]
+  },
+  CUNYFIRST_MFA_ACTION: {
+    type: "choice",
+    options: [
+      {
+        label: "Set up MFA",
+        value: "I need to set up CUNYfirst MFA."
+      },
+      {
+        label: "Reset / change MFA",
+        value: "I need to reset or change my CUNYfirst MFA."
+      }
+    ]
+  },
+  TSSC_MFA_RESET: {
+    type: "contact",
+    title: "Technology Support & Service Center",
+    message: "Only the Technology Support & Service Center can reset your MFA account.",
+    phone: "718-631-6348",
+    phoneHref: "tel:+17186316348",
+    email: "ServiceDesk@qcc.cuny.edu",
+    emailHref: "mailto:ServiceDesk@qcc.cuny.edu",
+    location: "Library Building, Room L-115"
   }
 };
 const ACTION_TOKEN_REGEX = /\[([A-Z0-9_]+)\]/g;
@@ -64,6 +113,100 @@ function loadMessages() {
   return [];
 }
 
+function sanitizeString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeAction(action) {
+  if (!action || typeof action !== "object") {
+    return null;
+  }
+
+  const type = action.type;
+
+  if (type === "link") {
+    const label = sanitizeString(action.label);
+    const url = sanitizeString(action.url);
+    if (!label || !url) {
+      return null;
+    }
+
+    return {
+      type: "link",
+      label,
+      url
+    };
+  }
+
+  if (type === "choice") {
+    const options = Array.isArray(action.options)
+      ? action.options
+          .map((option) => {
+            if (!option || typeof option !== "object") {
+              return null;
+            }
+
+            const label = sanitizeString(option.label);
+            const value = sanitizeString(option.value);
+            if (!label || !value) {
+              return null;
+            }
+
+            return { label, value };
+          })
+          .filter(Boolean)
+      : [];
+
+    if (options.length === 0) {
+      return null;
+    }
+
+    return {
+      type: "choice",
+      options
+    };
+  }
+
+  if (type === "contact") {
+    const title = sanitizeString(action.title);
+    const message = sanitizeString(action.message);
+    const phone = sanitizeString(action.phone);
+    const phoneHref = sanitizeString(action.phoneHref);
+    const email = sanitizeString(action.email);
+    const emailHref = sanitizeString(action.emailHref);
+    const location = sanitizeString(action.location);
+
+    if (!title || !message || !phone || !phoneHref || !email || !emailHref) {
+      return null;
+    }
+
+    return {
+      type: "contact",
+      title,
+      message,
+      phone,
+      phoneHref,
+      email,
+      emailHref,
+      location
+    };
+  }
+
+  if (type === "frontend_action") {
+    const frontEndAction = sanitizeString(action.action);
+    if (!frontEndAction) {
+      return null;
+    }
+
+    return {
+      type: "frontend_action",
+      action: frontEndAction
+    };
+  }
+
+  return null;
+}
+
 function parseChatActions(message) {
   if (typeof message !== "string") {
     return {
@@ -74,25 +217,12 @@ function parseChatActions(message) {
 
   const actions = [];
   const cleanMessage = message.replace(ACTION_TOKEN_REGEX, (match, tokenName) => {
-    const action = CHAT_ACTIONS[tokenName];
+    const action = normalizeAction(CHAT_ACTIONS[tokenName]);
     if (!action) {
       return "";
     }
 
-    const normalizedAction = {
-      type: action.type,
-      label: action.label
-    };
-
-    if (action.type === "link" && typeof action.url === "string") {
-      normalizedAction.url = action.url.trim();
-    }
-
-    if (action.type === "frontend_action" && typeof action.action === "string") {
-      normalizedAction.action = action.action.trim();
-    }
-
-    actions.push(normalizedAction);
+    actions.push(action);
     return "";
   }).replace(/\n{3,}/g, "\n\n").trim();
 
@@ -102,19 +232,151 @@ function parseChatActions(message) {
   };
 }
 
+function createActionLink({ label, url, ariaLabel, openInNewTab = true }) {
+  if (!label || !url) {
+    return null;
+  }
+
+  const actionLink = document.createElement("a");
+  actionLink.href = url;
+  actionLink.className = "it-chat__action-button";
+  actionLink.textContent = label;
+  actionLink.setAttribute("aria-label", ariaLabel || label);
+
+  if (openInNewTab) {
+    actionLink.target = "_blank";
+    actionLink.rel = "noopener noreferrer";
+  }
+
+  return actionLink;
+}
+
 function createChatActionButton(action) {
   if (!action || action.type !== "link" || typeof action.url !== "string" || !action.url.trim()) {
     return null;
   }
 
-  const actionLink = document.createElement("a");
-  actionLink.href = action.url;
-  actionLink.target = "_blank";
-  actionLink.rel = "noopener noreferrer";
-  actionLink.className = "it-chat__action-button";
-  actionLink.textContent = `${action.label} ↗`;
-  actionLink.setAttribute("aria-label", `${action.label} (opens in a new tab)`);
-  return actionLink;
+  return createActionLink({
+    label: `${action.label} ↗`,
+    url: action.url,
+    ariaLabel: `${action.label} (opens in a new tab)`
+  });
+}
+
+function renderChoiceAction(action, onSelect) {
+  if (!action || action.type !== "choice" || !Array.isArray(action.options)) {
+    return null;
+  }
+
+  const choiceGroup = document.createElement("div");
+  choiceGroup.className = "it-chat__choices";
+
+  const optionButtons = action.options.map((option) => {
+    const optionButton = document.createElement("button");
+    optionButton.type = "button";
+    optionButton.className = "it-chat__choice-button";
+    optionButton.textContent = option.label;
+    optionButton.setAttribute("aria-label", option.label);
+
+    optionButton.addEventListener("click", () => {
+      if (optionButton.disabled) {
+        return;
+      }
+
+      const buttons = Array.from(choiceGroup.querySelectorAll("button"));
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.setAttribute("aria-disabled", "true");
+      });
+      optionButton.classList.add("is-selected");
+      onSelect(option, buttons);
+    });
+
+    choiceGroup.appendChild(optionButton);
+    return optionButton;
+  });
+
+  if (optionButtons.length === 0) {
+    return null;
+  }
+
+  return choiceGroup;
+}
+
+function renderContactAction(action, container) {
+  if (!action || action.type !== "contact") {
+    return;
+  }
+
+  const card = document.createElement("div");
+  card.className = "it-chat__contact-card";
+
+  const title = document.createElement("h3");
+  title.className = "it-chat__contact-title";
+  title.textContent = action.title;
+
+  const message = document.createElement("p");
+  message.className = "it-chat__contact-message";
+  message.textContent = action.message;
+
+  const details = document.createElement("div");
+  details.className = "it-chat__contact-details";
+
+  const phoneLabel = document.createElement("div");
+  phoneLabel.className = "it-chat__contact-row";
+  const phoneText = document.createElement("a");
+  phoneText.href = action.phoneHref;
+  phoneText.className = "it-chat__contact-link";
+  phoneText.textContent = action.phone;
+  phoneText.setAttribute("aria-label", `Call ${action.phone}`);
+  phoneLabel.appendChild(phoneText);
+
+  const emailLabel = document.createElement("div");
+  emailLabel.className = "it-chat__contact-row";
+  const emailText = document.createElement("a");
+  emailText.href = action.emailHref;
+  emailText.className = "it-chat__contact-link";
+  emailText.textContent = action.email;
+  emailText.setAttribute("aria-label", `Email ${action.email}`);
+  emailLabel.appendChild(emailText);
+
+  if (action.location) {
+    const locationLabel = document.createElement("div");
+    locationLabel.className = "it-chat__contact-row";
+    const locationText = document.createElement("span");
+    locationText.className = "it-chat__contact-location";
+    locationText.textContent = action.location;
+    locationLabel.appendChild(locationText);
+    details.appendChild(locationLabel);
+  }
+
+  const contactButtons = document.createElement("div");
+  contactButtons.className = "it-chat__contact-actions";
+
+  const callButton = createActionLink({
+    label: "Call TSSC",
+    url: action.phoneHref,
+    ariaLabel: "Call the Technology Support & Service Center",
+    openInNewTab: false
+  });
+  const emailButton = createActionLink({
+    label: "Email TSSC",
+    url: action.emailHref,
+    ariaLabel: "Email the Technology Support & Service Center",
+    openInNewTab: false
+  });
+
+  if (callButton) {
+    contactButtons.appendChild(callButton);
+  }
+  if (emailButton) {
+    contactButtons.appendChild(emailButton);
+  }
+
+  details.prepend(phoneLabel, emailLabel);
+
+  card.append(title, message, details, contactButtons);
+  container.appendChild(card);
 }
 
 function renderChatActions(actions, messageContainer) {
@@ -126,9 +388,33 @@ function renderChatActions(actions, messageContainer) {
   actionContainer.className = "it-chat__actions";
 
   actions.forEach((action) => {
-    const button = createChatActionButton(action);
-    if (button) {
-      actionContainer.appendChild(button);
+    if (action.type === "link") {
+      const button = createChatActionButton(action);
+      if (button) {
+        actionContainer.appendChild(button);
+      }
+      return;
+    }
+
+    if (action.type === "choice") {
+      const choiceGroup = renderChoiceAction(action, (selectedOption) => {
+        const selectedText = selectedOption.value;
+        if (!selectedText) {
+          return;
+        }
+
+        sendMessage(selectedText).catch((error) => {
+          console.error("IT assistant clarification request failed.", error);
+        });
+      });
+      if (choiceGroup) {
+        actionContainer.appendChild(choiceGroup);
+      }
+      return;
+    }
+
+    if (action.type === "contact") {
+      renderContactAction(action, actionContainer);
     }
   });
 
@@ -249,15 +535,18 @@ function initializeChatbot() {
     scrollToLatest();
   }
 
-  async function sendMessage() {
-    const userMessage = input.value.trim();
+  async function sendMessage(messageTextOverride) {
+    const hasOverride = typeof messageTextOverride === "string";
+    const userMessage = hasOverride ? messageTextOverride.trim() : input.value.trim();
     if (!userMessage || isWaiting) {
       return;
     }
 
     addMessage("user", userMessage);
-    input.value = "";
-    input.style.height = "auto";
+    if (!hasOverride) {
+      input.value = "";
+      input.style.height = "auto";
+    }
     setWaiting(true);
 
     const controller = new AbortController();
