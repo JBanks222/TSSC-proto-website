@@ -80,6 +80,76 @@ test("parseChatActions supports MFA choice and contact tokens", () => {
   ]);
 });
 
+test("choice actions submit the selected value through the existing message flow", () => {
+  function createElement(tagName) {
+    const element = {
+      tagName: tagName.toUpperCase(),
+      children: [],
+      className: "",
+      textContent: "",
+      href: "",
+      rel: "",
+      target: "",
+      disabled: false,
+      attributes: {},
+      listeners: {},
+      classList: {
+        add() {},
+        remove() {}
+      },
+      appendChild(child) {
+        this.children.push(child);
+        return child;
+      },
+      setAttribute(name, value) {
+        this.attributes[name] = value;
+      },
+      addEventListener(eventName, handler) {
+        this.listeners[eventName] = handler;
+      },
+      querySelectorAll(selector) {
+        if (selector === "button") {
+          return this.children.filter((child) => child && child.tagName === "BUTTON");
+        }
+        return [];
+      },
+      hasChildNodes() {
+        return this.children.length > 0;
+      }
+    };
+    return element;
+  }
+
+  const documentStub = {
+    createElement
+  };
+
+  sandbox.document = documentStub;
+
+  let submittedValue = null;
+  const container = createElement("div");
+  sandbox.renderChatActions([
+    {
+      type: "choice",
+      options: [
+        { label: "Microsoft 365 MFA", value: "I need help with Microsoft 365 MFA." },
+        { label: "CUNYfirst MFA", value: "I need help with CUNYfirst MFA." }
+      ]
+    }
+  ], container, async (value) => {
+    submittedValue = value;
+  });
+
+  const actionContainer = container.children[0];
+  const choiceGroup = actionContainer.children[0];
+  const firstButton = choiceGroup.children[0];
+  const clickHandler = Object.values(firstButton.listeners)[0];
+  clickHandler.call(firstButton);
+
+  assert.equal(submittedValue, "I need help with Microsoft 365 MFA.");
+  assert.equal(firstButton.disabled, true);
+});
+
 test("parseChatActions ignores unknown action-like tokens", () => {
   const result = sandbox.parseChatActions("Need help. [SOME_RANDOM_ACTION]");
 

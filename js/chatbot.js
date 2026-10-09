@@ -1,4 +1,4 @@
-const N8N_WEBHOOK_URL = "https://jalen222.app.n8n.cloud/webhook/782df198-c304-498e-b5ff-9e443f0b303c";
+const N8N_WEBHOOK_URL = "https://jalen222.app.n8n.cloud/webhook-test/782df198-c304-498e-b5ff-9e443f0b303c";
 
 const CHAT_SESSION_KEY = "itChatSessionId";
 const CHAT_HISTORY_KEY = "itChatMessages";
@@ -379,7 +379,7 @@ function renderContactAction(action, container) {
   container.appendChild(card);
 }
 
-function renderChatActions(actions, messageContainer) {
+function renderChatActions(actions, messageContainer, onMessageSubmit) {
   if (!Array.isArray(actions) || actions.length === 0) {
     return;
   }
@@ -399,11 +399,11 @@ function renderChatActions(actions, messageContainer) {
     if (action.type === "choice") {
       const choiceGroup = renderChoiceAction(action, (selectedOption) => {
         const selectedText = selectedOption.value;
-        if (!selectedText) {
+        if (!selectedText || typeof onMessageSubmit !== "function") {
           return;
         }
 
-        sendMessage(selectedText).catch((error) => {
+        Promise.resolve(onMessageSubmit(selectedText)).catch((error) => {
           console.error("IT assistant clarification request failed.", error);
         });
       });
@@ -479,7 +479,7 @@ function initializeChatbot() {
     messageElement.append(sender, bubble);
 
     if (message.role === "assistant") {
-      renderChatActions(parsedMessage.actions, messageElement);
+      renderChatActions(parsedMessage.actions, messageElement, sendMessage);
     }
 
     return messageElement;
