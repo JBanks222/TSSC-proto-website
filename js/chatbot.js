@@ -1,8 +1,11 @@
 const N8N_WEBHOOK_URL = "https://jalen222.app.n8n.cloud/webhook/782df198-c304-498e-b5ff-9e443f0b303c";
+const CHAT_MESSAGES_URL = "https://jalen222.app.n8n.cloud/webhook/chat/messages";
 
 const CHAT_SESSION_KEY = "itChatSessionId";
 const CHAT_HISTORY_KEY = "itChatMessages";
-const CHAT_TIMEOUT_MS = 25000;
+const CHAT_TIMEOUT_MS = 60000;
+const CHAT_POLL_TIMEOUT_MS = 10000;
+const HANDOFF_POLL_INTERVAL_MS = 3000;
 const ASSISTANT_RESPONSE_PROPERTY = "response";
 const INITIAL_MESSAGE = "Hi! I'm the IT Help Assistant. What can I help you with today?";
 const CONNECTION_ERROR = "Sorry, I'm having trouble connecting to the IT assistant right now. Please try again in a moment.";
@@ -75,14 +78,27 @@ function createSessionId() {
   return `it-chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-// Reuse this ID for every request in the same browser tab; it contains no personal data.
+function readStoredSessionId() {
+  try {
+    return globalThis.localStorage?.getItem(CHAT_SESSION_KEY) || sessionStorage.getItem(CHAT_SESSION_KEY);
+  } catch (error) {
+    console.error("Unable to read the stored IT chat session.", error);
+    return null;
+  }
+}
+
 function getSessionId() {
   let sessionId;
 
   try {
-    sessionId = sessionStorage.getItem(CHAT_SESSION_KEY);
+    sessionId = readStoredSessionId();
     if (!sessionId) {
       sessionId = createSessionId();
+      try {
+        globalThis.localStorage?.setItem(CHAT_SESSION_KEY, sessionId);
+      } catch (error) {
+        console.error("Unable to persist the IT chat session in local storage.", error);
+      }
       sessionStorage.setItem(CHAT_SESSION_KEY, sessionId);
     }
   } catch (error) {
@@ -94,6 +110,95 @@ function getSessionId() {
   }
 
   return sessionId;
+}
+
+// Human handoff state and polling support.
+function loadHandoffState(sessionId) {
+  const defaultState = { humanMode: false, status: "none", lastSeq: 0, staffName: null };
+  try {
+    const savedState = JSON.parse(globalThis.localStorage?.getItem(`itChatHandoff:${sessionId}`) || "null");
+    return savedState && typeof savedState === "object"
+      ? { ...defaultState, ...savedState, lastSeq: Number(savedState.lastSeq) || 0 }
+      : defaultState;
+  } catch (error) {
+    console.error("Unable to restore IT chat handoff state.", error);
+    return defaultState;
+  }
+}
+
+function saveHandoffState(sessionId, state) {
+  try {
+    globalThis.localStorage?.setItem(`itChatHandoff:${sessionId}`, JSON.stringify(state));
+  } catch (error) {
+    console.error("Unable to save IT chat handoff state.", error);
+  }
+}
+
+// Polling is single-flight, visibility-aware, and retries with bounded backoff.
+function createPoller(fn, intervalMs) {
+  let timer = null;
+  let running = false;
+  let inFlight = false;
+  let backoffMs = intervalMs;
+
+  function clearTimer() {
+    if (timer !== null) {
+      window.clearTimeout(timer);
+      timer = null;
+    }
+  }
+
+  function schedule(delay) {
+    clearTimer();
+    if (running && document.visibilityState !== "hidden") {
+      timer = window.setTimeout(run, delay);
+    }
+  }
+
+  async function run() {
+    if (!running || inFlight || document.visibilityState === "hidden") {
+      return;
+    }
+
+    inFlight = true;
+    let nextDelay = intervalMs;
+    try {
+      await fn();
+      backoffMs = intervalMs;
+    } catch (error) {
+      console.error("IT chat message polling failed.", error);
+      backoffMs = Math.min(Math.max(intervalMs, backoffMs * 2), 15000);
+      nextDelay = backoffMs;
+    } finally {
+      inFlight = false;
+      schedule(nextDelay);
+    }
+  }
+
+  function handleVisibilityChange() {
+    if (document.visibilityState === "hidden") {
+      clearTimer();
+    } else if (running && !inFlight) {
+      run();
+    }
+  }
+
+  function start() {
+    if (running) {
+      return;
+    }
+    running = true;
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    run();
+  }
+
+  function stop() {
+    running = false;
+    clearTimer();
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }
+
+  return { start, stop };
 }
 
 function loadMessages() {
@@ -430,6 +535,9 @@ function initializeChatbot() {
   const closeButton = document.getElementById("itChatClose");
   const messagesElement = document.getElementById("itChatMessages");
   const typingIndicator = document.getElementById("itChatTyping");
+  const typingLabel = typingIndicator?.querySelector(".it-chat__typing-label");
+  const handoffBanner = document.getElementById("itChatHandoffBanner");
+  const newMessagesButton = document.getElementById("itChatNewMessages");
   const form = document.getElementById("itChatForm");
   const input = document.getElementById("itChatInput");
   const sendButton = document.getElementById("itChatSend");
@@ -438,10 +546,15 @@ function initializeChatbot() {
     return;
   }
 
-  getSessionId();
+  let sessionId = readStoredSessionId();
   let messages = loadMessages();
+  let handoffState = sessionId
+    ? loadHandoffState(sessionId)
+    : { humanMode: false, status: "none", lastSeq: 0, staffName: null };
   let isWaiting = false;
   let previousFocus = null;
+  let poller = null;
+  let initialPollPending = Boolean(sessionId);
 
   if (!messages.length) {
     messages = [{ role: "assistant", content: INITIAL_MESSAGE }];
@@ -457,42 +570,144 @@ function initializeChatbot() {
 
   function scrollToLatest() {
     messagesElement.scrollTop = messagesElement.scrollHeight;
+    if (newMessagesButton) {
+      newMessagesButton.hidden = true;
+    }
+  }
+
+  function isScrolledUp() {
+    return messagesElement.scrollHeight - messagesElement.scrollTop - messagesElement.clientHeight > 60;
+  }
+
+  function updateHandoffBanner() {
+    if (!handoffBanner) {
+      return;
+    }
+
+    handoffBanner.hidden = !handoffState.humanMode;
+    if (!handoffState.humanMode) {
+      handoffBanner.textContent = "";
+      return;
+    }
+
+    if (handoffState.status === "active" || handoffState.staffName) {
+      handoffBanner.textContent = `You're now chatting with ${handoffState.staffName || "a support team member"}.`;
+    } else {
+      handoffBanner.textContent = "Connecting you with a support team member… You can keep typing.";
+    }
+  }
+
+  function setHumanMode(active, status = "waiting", staffName = null) {
+    handoffState.humanMode = active;
+    handoffState.status = status || (active ? "waiting" : "none");
+    handoffState.staffName = active ? (staffName || handoffState.staffName || null) : null;
+    panel.classList.toggle("is-human-mode", active);
+    updateHandoffBanner();
+    if (sessionId) {
+      saveHandoffState(sessionId, handoffState);
+    }
+    setWaiting(isWaiting);
+  }
+
+  function formatMessageTime(value) {
+    const date = value ? new Date(value) : null;
+    if (!date || Number.isNaN(date.getTime())) {
+      return "";
+    }
+    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   }
 
   function createMessageElement(message) {
     const messageElement = document.createElement("article");
     messageElement.className = `it-chat__message it-chat__message--${message.role}`;
 
+    if (message.role === "system") {
+      const note = document.createElement("p");
+      note.className = "it-chat__system-note";
+      note.textContent = message.content;
+      messageElement.setAttribute("aria-label", `System message: ${message.content}`);
+      messageElement.appendChild(note);
+      return messageElement;
+    }
+
+    const senderName = message.role === "user"
+      ? "You"
+      : message.role === "staff"
+        ? (message.staffName || "Support team")
+        : "IT Help Assistant";
+    const meta = document.createElement("div");
+    meta.className = "it-chat__message-meta";
     const sender = document.createElement("span");
     sender.className = "it-chat__sender";
-    sender.textContent = message.role === "user" ? "You" : "IT Help Assistant";
+    sender.textContent = senderName;
+    meta.appendChild(sender);
+
+    const messageTime = formatMessageTime(message.sentAt || message.sent_at);
+    if (messageTime && message.role !== "user") {
+      const time = document.createElement("time");
+      time.className = "it-chat__message-time";
+      time.textContent = messageTime;
+      if (message.sentAt || message.sent_at) {
+        const date = new Date(message.sentAt || message.sent_at);
+        if (!Number.isNaN(date.getTime())) {
+          time.dateTime = date.toISOString();
+        }
+      }
+      meta.appendChild(time);
+    }
 
     const bubble = document.createElement("p");
     bubble.className = "it-chat__bubble";
 
-    const parsedMessage = message.role === "assistant" ? parseChatActions(message.content) : {
+    const parsedMessage = message.role === "assistant" || message.role === "staff" ? parseChatActions(message.content) : {
       cleanMessage: message.content,
       actions: []
     };
 
     bubble.textContent = parsedMessage.cleanMessage;
-    messageElement.append(sender, bubble);
+    messageElement.append(meta, bubble);
 
-    if (message.role === "assistant") {
+    if (message.role === "staff") {
+      messageElement.setAttribute("aria-label", `Staff member ${senderName} said: ${parsedMessage.cleanMessage}`);
+    }
+
+    if (message.sent) {
+      const sentLabel = document.createElement("span");
+      sentLabel.className = "it-chat__delivery-status";
+      sentLabel.textContent = "Sent";
+      messageElement.appendChild(sentLabel);
+    }
+
+    if (message.failed) {
+      const retryLink = document.createElement("a");
+      retryLink.className = "it-chat__retry";
+      retryLink.href = "#";
+      retryLink.textContent = "Couldn't send – Retry";
+      retryLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        sendMessage(message.content, message);
+      });
+      messageElement.appendChild(retryLink);
+    }
+
+    if (message.role === "assistant" || message.role === "staff") {
       renderChatActions(parsedMessage.actions, messageElement, sendMessage);
     }
 
     return messageElement;
   }
 
-  function addMessage(role, content) {
-    const message = { role, content };
+  function addMessage(role, content, options = {}) {
+    const message = { role, content, sentAt: options.sentAt || Date.now(), ...options };
     messages.push(message);
 
     const messageElement = createMessageElement(message);
     messagesElement.insertBefore(messageElement, typingIndicator);
     saveMessages();
-    scrollToLatest();
+    if (options.scroll !== false) {
+      scrollToLatest();
+    }
+    return message;
   }
 
   function renderMessages() {
@@ -503,6 +718,162 @@ function initializeChatbot() {
     });
     saveMessages();
     scrollToLatest();
+  }
+
+  function findMatchingMessage(remoteMessage, role) {
+    const sequence = Number(remoteMessage.seq);
+    const remoteText = typeof remoteMessage.message === "string" ? remoteMessage.message : "";
+    const remoteTime = Date.parse(remoteMessage.sent_at) || Date.now();
+    return messages.find((message) => {
+      if (sequence && Number(message.seq) === sequence) {
+        return true;
+      }
+      if (message.role !== role || message.content !== remoteText) {
+        return false;
+      }
+      const localTime = Number(message.sentAt) || remoteTime;
+      return Math.abs(remoteTime - localTime) <= 30000;
+    });
+  }
+
+  function processPolledMessages(remoteMessages, markUsersSent) {
+    if (!Array.isArray(remoteMessages) || remoteMessages.length === 0) {
+      return { added: 0, hasSystem: false, staffName: null };
+    }
+
+    if (messages.length === 1 && messages[0].role === "assistant" && messages[0].content === INITIAL_MESSAGE) {
+      messages = [];
+      renderMessages();
+    }
+
+    const wasScrolledUp = isScrolledUp();
+    let added = 0;
+    let hasSystem = false;
+    let staffName = null;
+    const orderedMessages = [...remoteMessages].sort((first, second) => (Number(first.seq) || 0) - (Number(second.seq) || 0));
+
+    orderedMessages.forEach((remoteMessage) => {
+      if (!remoteMessage || typeof remoteMessage.message !== "string" || !remoteMessage.message.trim()) {
+        return;
+      }
+
+      const remoteRole = remoteMessage.sender === "user"
+        ? "user"
+        : remoteMessage.sender === "ai"
+          ? "assistant"
+          : remoteMessage.sender === "staff" || remoteMessage.sender === "system"
+            ? remoteMessage.sender
+            : null;
+      if (!remoteRole) {
+        return;
+      }
+
+      hasSystem ||= remoteRole === "system";
+      if (remoteRole === "staff" && typeof remoteMessage.staff_name === "string" && remoteMessage.staff_name.trim()) {
+        staffName = remoteMessage.staff_name.trim();
+      }
+
+      const existingMessage = findMatchingMessage(remoteMessage, remoteRole);
+      if (existingMessage) {
+        if (remoteMessage.seq) {
+          existingMessage.seq = Number(remoteMessage.seq);
+        }
+        if (remoteRole === "user" && markUsersSent) {
+          existingMessage.sent = true;
+        }
+        return;
+      }
+
+      addMessage(remoteRole, remoteMessage.message, {
+        seq: Number(remoteMessage.seq) || undefined,
+        sentAt: Date.parse(remoteMessage.sent_at) || Date.now(),
+        staffName: remoteRole === "staff" ? (remoteMessage.staff_name || null) : null,
+        sent: remoteRole === "user" && markUsersSent,
+        scroll: false
+      });
+      added += 1;
+    });
+
+    if (added > 0) {
+      if (wasScrolledUp && !panel.hidden) {
+        if (newMessagesButton) {
+          newMessagesButton.hidden = false;
+        }
+      } else {
+        scrollToLatest();
+      }
+    }
+    saveMessages();
+    return { added, hasSystem, staffName };
+  }
+
+  function startPolling() {
+    if (!sessionId) {
+      sessionId = getSessionId();
+      handoffState = loadHandoffState(sessionId);
+    }
+    if (!poller) {
+      poller = createPoller(pollMessages, HANDOFF_POLL_INTERVAL_MS);
+    }
+    poller.start();
+  }
+
+  async function pollMessages() {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), CHAT_POLL_TIMEOUT_MS);
+    const since = initialPollPending ? 0 : handoffState.lastSeq;
+    initialPollPending = false;
+
+    try {
+      const pollUrl = new URL(CHAT_MESSAGES_URL);
+      pollUrl.searchParams.set("sessionId", sessionId);
+      pollUrl.searchParams.set("since", String(since));
+      const response = await fetch(pollUrl, { method: "GET", signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`Chat message polling returned HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const remoteMessages = Array.isArray(payload?.messages) ? payload.messages : [];
+      const wasHumanMode = handoffState.humanMode;
+      const status = typeof payload?.status === "string" ? payload.status : "none";
+      const isHumanMode = payload?.human_mode === true;
+      const shouldLeave = wasHumanMode && (!isHumanMode || status === "closed");
+      const rendered = processPolledMessages(remoteMessages, isHumanMode || wasHumanMode);
+
+      remoteMessages.forEach((message) => {
+        const sequence = Number(message?.seq);
+        if (Number.isFinite(sequence) && sequence > handoffState.lastSeq) {
+          handoffState.lastSeq = sequence;
+        }
+      });
+
+      if (isHumanMode && status !== "closed") {
+        const active = status === "active" || Boolean(rendered.staffName);
+        setHumanMode(true, active ? "active" : (status === "waiting" ? "waiting" : "waiting"), rendered.staffName);
+      } else if (shouldLeave) {
+        if (!rendered.hasSystem) {
+          const shouldScroll = panel.hidden || !isScrolledUp();
+          addMessage("system", "A staff member has ended the chat…", { scroll: false });
+          if (shouldScroll) {
+            scrollToLatest();
+          } else if (newMessagesButton) {
+            newMessagesButton.hidden = false;
+          }
+        }
+        setHumanMode(false, status === "closed" ? "closed" : "none", null);
+        poller?.stop();
+      } else {
+        handoffState.status = status;
+      }
+
+      saveHandoffState(sessionId, handoffState);
+      if (!handoffState.humanMode && !wasHumanMode) {
+        poller?.stop();
+      }
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
   }
 
   function openChat() {
@@ -532,17 +903,30 @@ function initializeChatbot() {
     input.disabled = waiting;
     sendButton.disabled = waiting;
     typingIndicator.hidden = !waiting;
-    scrollToLatest();
+    typingIndicator.classList.toggle("it-chat__typing--sending", handoffState.humanMode);
+    typingIndicator.setAttribute("aria-label", handoffState.humanMode ? "Sending" : "Assistant is typing");
+    if (typingLabel) {
+      typingLabel.hidden = !handoffState.humanMode;
+    }
+    if (!isScrolledUp()) {
+      scrollToLatest();
+    }
   }
 
-  async function sendMessage(messageTextOverride) {
+  async function sendMessage(messageTextOverride, existingMessage = null) {
     const hasOverride = typeof messageTextOverride === "string";
     const userMessage = hasOverride ? messageTextOverride.trim() : input.value.trim();
     if (!userMessage || isWaiting) {
       return;
     }
 
-    addMessage("user", userMessage);
+    sessionId = sessionId || getSessionId();
+    if (!existingMessage) {
+      existingMessage = addMessage("user", userMessage);
+    } else {
+      existingMessage.failed = false;
+      renderMessages();
+    }
     if (!hasOverride) {
       input.value = "";
       input.style.height = "auto";
@@ -571,13 +955,27 @@ function initializeChatbot() {
       // Update this extraction if the workflow returns a different response shape.
       const payload = await response.json();
       const assistantResponse = payload?.[ASSISTANT_RESPONSE_PROPERTY];
-      if (typeof assistantResponse !== "string" || !assistantResponse.trim()) {
+      const enteredHumanMode = payload?.human_mode === true;
+      if (typeof assistantResponse !== "string" || (!assistantResponse.trim() && !enteredHumanMode)) {
         throw new Error(`n8n webhook response did not include a non-empty ${ASSISTANT_RESPONSE_PROPERTY} string`);
       }
 
-      addMessage("assistant", assistantResponse.trim());
+      existingMessage.failed = false;
+      if (assistantResponse.trim()) {
+        addMessage("assistant", assistantResponse.trim());
+      }
+      if (payload?.status === "sent_to_agent") {
+        existingMessage.sent = true;
+        renderMessages();
+      }
+      if (enteredHumanMode) {
+        setHumanMode(true, "waiting", handoffState.staffName);
+        startPolling();
+      }
     } catch (error) {
       console.error("IT assistant request failed.", error);
+      existingMessage.failed = true;
+      renderMessages();
       addMessage("assistant", CONNECTION_ERROR);
     } finally {
       window.clearTimeout(timeoutId);
@@ -614,6 +1012,13 @@ function initializeChatbot() {
     input.style.height = `${Math.min(input.scrollHeight, 112)}px`;
   });
 
+  messagesElement.addEventListener("scroll", () => {
+    if (!isScrolledUp() && newMessagesButton) {
+      newMessagesButton.hidden = true;
+    }
+  });
+  newMessagesButton?.addEventListener("click", scrollToLatest);
+
   document.addEventListener("keydown", (event) => {
     if (panel.hidden) {
       return;
@@ -640,6 +1045,15 @@ function initializeChatbot() {
   });
 
   renderMessages();
+  updateHandoffBanner();
+  panel.classList.toggle("is-human-mode", handoffState.humanMode);
+  setWaiting(false);
+  if (sessionId) {
+    saveHandoffState(sessionId, handoffState);
+  }
+  if (handoffState.humanMode || sessionId) {
+    startPolling();
+  }
 }
 
 initializeChatbot();

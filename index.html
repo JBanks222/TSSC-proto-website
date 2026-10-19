@@ -334,9 +334,12 @@
         </button>
       </header>
 
+      <div class="it-chat__handoff-banner" id="itChatHandoffBanner" role="status" hidden></div>
       <div class="it-chat__messages" id="itChatMessages" aria-live="polite" aria-relevant="additions text">
+        <button class="it-chat__new-messages" id="itChatNewMessages" type="button" hidden>New messages ↓</button>
         <div class="it-chat__typing" id="itChatTyping" role="status" aria-label="Assistant is typing" hidden>
           <span></span><span></span><span></span>
+          <span class="it-chat__typing-label" hidden>Sending…</span>
         </div>
       </div>
 
